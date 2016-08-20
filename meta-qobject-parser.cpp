@@ -19,8 +19,8 @@ struct MetaProperty {
 
 struct MetaClass {
         std::vector<std::unique_ptr<MetaProperty>> properties;
-        std::vector<std::unique_ptr<MetaClass>> subgroups;
-        std::string className;
+        std::vector<std::unique_ptr<MetaClass>> subclasses;
+        std::string name;
         MetaClass *parent;
 };
 
@@ -67,11 +67,11 @@ callback_t state_class(std::ifstream& f) {
         current_class->parent = nullptr;
     } else {
         MetaClass *old_parent = current_class;
-        current_class->subgroups.push_back(std::make_unique<MetaClass>());
-        current_class = current_class->subgroups.back().get();
+        current_class->subclasses.push_back(std::make_unique<MetaClass>());
+        current_class = current_class->subclasses.back().get();
         current_class->parent = old_parent;
     }
-    current_class->className  = global_string;
+    current_class->name  = global_string;
     global_string.clear();
     return guess_class_state;;
 }
@@ -84,7 +84,7 @@ callback_t state_string(std::ifstream& f) {
 
 callback_t state_end_class(std::ifstream& f) {
     f.ignore();
-    if (global_debug) std::cout << "class finished: " << current_class->className << std::endl;
+    if (global_debug) std::cout << "class finished: " << current_class->name << std::endl;
     if (current_class->parent) {
         current_class = current_class->parent;
         return guess_class_state;
@@ -107,8 +107,8 @@ callback_t state_property(std::ifstream& f) {
     property->name = property_name;
     property->type = property_type;
     if (f.peek() == ':') {
-        std::cout << "starting to add complex properties" << std::endl;
-        return nullptr;
+        f.ignore();
+        return guess_class_state;
     } else {
         return guess_class_state;
     }
@@ -155,6 +155,46 @@ callback_t guess_state(std::ifstream& f) {
     return nullptr;
 }
 
+void dump_class_header(MetaClass *top, std::ofstream& file) {
+    for(auto&& child : top->subclasses) {
+        dump_class_header(child.get(), file);
+    }
+
+    file << "class " << top->name << " : public QObject {"  << std::endl;
+    file << "Q_OBJECT" << std::endl;
+
+    // Q_PROPERTY declarations
+    for(auto&& p : top->properties) {
+        file << "Q_PROPERTY(" << p->type << " " << p->name << " READ " << p->name << " WRITE set" << p->name << " NOTIFY " << p->name << "Changed)" << std::endl;
+    }
+    file << std::endl;
+    file << "public:" << std::endl;
+    file <<"\t" << top->name <<"(QObject *parent);" << std::endl;
+
+    if (top->properties.size()) {
+        for(auto&& p : top->properties) {
+            file << "\t" << p->type << " " << p->name << "() const;" << std::endl;
+        }
+
+        file << std::endl;
+        file <<"public slots:" <<std::endl;
+        for(auto&& p : top->properties) {
+            file << "\tvoid set" << p->name << "(" << p->type <<" value);" << std::endl;
+        }
+
+        file <<"signals:" <<std::endl;
+        for(auto&& p : top->properties) {
+            file << "\tvoid " << p->name << "Changed(" << p->type <<" value);" << std::endl;
+        }
+
+        file <<"private:" <<std::endl;
+        for(auto&& p : top->properties) {
+            file << "\t" << p->type << " _" << p->name <<";" << std::endl;
+        }
+    }
+    file << "};" <<std::endl << std::endl;
+}
+
 void show_usage() {
     std::cout << "usage: qobject-compiler if=file.conf of=file.cpp" << std::endl;
 }
@@ -180,4 +220,9 @@ int main(int argc, char *argv[]) {
     while( state ) {
         state = state(file);
     }
+
+    // the class-tree is ready.
+    std::ofstream header("test.h");
+    dump_class_header(current_class, header);
+    header.close();
 }
