@@ -6,10 +6,6 @@
 #include <string>
 #include <memory>
 
-typedef std::string property;
-typedef std::string type;
-typedef std::string setter;
-
 struct MetaProperty {
     std::string name;
     std::string default_value;
