@@ -10,9 +10,15 @@ typedef std::string property;
 typedef std::string type;
 typedef std::string setter;
 
+struct MetaProperty {
+    std::string name;
+    std::string default_value;
+    std::string type;
+    std::string setter;
+};
+
 struct MetaClass {
-        std::vector<std::pair<property, type>> properties;
-        std::map<property, setter> setters;
+        std::vector<std::unique_ptr<MetaProperty>> properties;
         std::vector<std::unique_ptr<MetaClass>> subgroups;
         std::string className;
         MetaClass *parent;
@@ -30,7 +36,6 @@ typedef RecursiveHelper<std::ifstream&>::type callback_t;
 bool global_debug = false;
 std::string global_string;
 std::vector<std::string> includes;
-
 std::unique_ptr<MetaClass> top_level_class = nullptr;
 MetaClass *current_class = nullptr;
 
@@ -68,7 +73,7 @@ callback_t state_class(std::ifstream& f) {
     }
     current_class->className  = global_string;
     global_string.clear();
-    return guess_state;
+    return guess_class_state;;
 }
 
 callback_t state_string(std::ifstream& f) {
@@ -82,8 +87,42 @@ callback_t state_end_class(std::ifstream& f) {
     if (global_debug) std::cout << "class finished: " << current_class->className << std::endl;
     if (current_class->parent) {
         current_class = current_class->parent;
+        return guess_class_state;
     }
+
     return guess_state;
+}
+
+callback_t state_property(std::ifstream& f) {
+    std::string property_type = global_string;
+    std::string property_name;
+    f >> property_name;
+    std::cout << "Property type:  " << property_type << ", name " << property_name << std::endl;
+    clear_empty(f);
+    char c = f.peek();
+
+    current_class->properties.push_back(std::make_unique<MetaProperty>());
+    auto property = current_class->properties.back().get();
+
+    property->name = property_name;
+    property->type = property_type;
+    if (f.peek() == ':') {
+        std::cout << "starting to add complex properties" << std::endl;
+        return nullptr;
+    } else {
+        return guess_class_state;
+    }
+}
+
+callback_t state_class_string(std::ifstream& f) {
+        f >> global_string;
+        clear_empty(f);
+
+        if (f.peek() == '{') {
+            return state_class;
+        } else {
+            return state_property;
+        }
 }
 
 callback_t guess_class_state(std::ifstream& f) {
@@ -93,8 +132,9 @@ callback_t guess_class_state(std::ifstream& f) {
         case '\n' :
             clear_empty(f);
             return guess_class_state;
-        case '}' : return state_end_class(f);
+        case '}' : return state_end_class;
         case '{' : return state_class;
+        default : return state_class_string;
     }
     return nullptr;
 }
