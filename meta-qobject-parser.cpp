@@ -163,9 +163,17 @@ void dump_class_header(MetaClass *top, std::ofstream& file) {
     for(auto&& p : top->properties) {
         file << "Q_PROPERTY(" << p->type << " " << p->name << " READ " << p->name << " WRITE set" << p->name << " NOTIFY " << p->name << "Changed)" << std::endl;
     }
+    for(auto&& child : top->subclasses) {
+        file <<"Q_PROPERTY(QObject* " << child->name << " MEMBER _" << child->name << " CONSTANT);" << std::endl;
+    }
+
     file << std::endl;
     file << "public:" << std::endl;
     file <<"\t" << top->name <<"(QObject *parent);" << std::endl;
+
+    for(auto&& child : top->subclasses) {
+        file  << "\t" << child->name << " *_" << child->name << ";" << std::endl;
+    }
 
     if (top->properties.size()) {
         for(auto&& p : top->properties) {
