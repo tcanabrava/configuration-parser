@@ -4,6 +4,7 @@
 #include <map>
 #include <vector>
 #include <string>
+#include <memory>
 
 typedef std::string property;
 typedef std::string type;
@@ -12,8 +13,9 @@ typedef std::string setter;
 struct MetaClass {
         std::vector<std::pair<property, type>> properties;
         std::map<property, setter> setters;
-        std::vector<MetaClass*> subgroups;
+        std::vector<std::unique_ptr<MetaClass>> subgroups;
         std::string className;
+        MetaClass *parent;
 };
 
 template< typename... T > struct RecursiveHelper {
@@ -26,11 +28,15 @@ template< typename... T > struct RecursiveHelper {
 typedef RecursiveHelper<std::ifstream&>::type callback_t;
 
 bool global_debug = false;
-std::string temporary;
+std::string global_string;
 std::vector<std::string> includes;
 
+std::unique_ptr<MetaClass> top_level_class = nullptr;
+MetaClass *current_class = nullptr;
+
 callback_t guess_state(std::ifstream& f);
-callback_t state_empty(std::ifstream& f);
+void clear_empty(std::ifstream& f);
+callback_t guess_class_state(std::ifstream& f);
 
 callback_t state_include(std::ifstream& f) {
     char include_name[80];
@@ -41,18 +47,55 @@ callback_t state_include(std::ifstream& f) {
     return guess_state;
 }
 
-callback_t state_empty(std::ifstream& f) {
+void clear_empty(std::ifstream& f) {
     while(f.peek() == ' '  || f.peek() == '\n'){
         f.ignore();
+    }
+}
+
+callback_t state_class(std::ifstream& f) {
+    if (global_debug) std::cout << "Starting class: " << global_string << std::endl;
+    f.ignore();
+    if (!top_level_class) {
+        top_level_class = std::make_unique<MetaClass>();
+        current_class = top_level_class.get();
+        current_class->parent = nullptr;
+    } else {
+        MetaClass *old_parent = current_class;
+        current_class->subgroups.push_back(std::make_unique<MetaClass>());
+        current_class = current_class->subgroups.back().get();
+        current_class->parent = old_parent;
+    }
+    current_class->className  = global_string;
+    global_string.clear();
+    return guess_state;
+}
+
+callback_t state_string(std::ifstream& f) {
+    f >> global_string;
+//    if (global_debug) std::cout << "string added: " << global_string << std::endl;
+    return guess_state;
+}
+
+callback_t state_end_class(std::ifstream& f) {
+    f.ignore();
+    if (global_debug) std::cout << "class finished: " << current_class->className << std::endl;
+    if (current_class->parent) {
+        current_class = current_class->parent;
     }
     return guess_state;
 }
 
-callback_t state_class(std::ifstream& f) {
-    return nullptr;
-}
-
-callback_t state_string(std::ifstream& f) {
+callback_t guess_class_state(std::ifstream& f) {
+    char c = f.peek();
+    switch(c) {
+        case ' ' :
+        case '\n' :
+            clear_empty(f);
+            return guess_class_state;
+        case '}' : return state_end_class(f);
+        case '{' : return state_class;
+    }
     return nullptr;
 }
 
@@ -60,10 +103,13 @@ callback_t guess_state(std::ifstream& f) {
     char c = f.peek();
     switch(c) {
         case '#' : return state_include;
-        case ' ' :
-        case '\n' : return state_empty;
         case '{' : return state_class;
+        case '}' : return state_end_class;
         case EOF : return nullptr;
+        case ' ' :
+        case '\n' :
+            clear_empty(f);
+            return guess_state;
         default : return state_string;
     }
     return nullptr;
