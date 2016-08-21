@@ -196,6 +196,39 @@ callback_t guess_state(std::ifstream& f) {
     return nullptr;
 }
 
+void dump_class_settings(MetaClass *top, std::ofstream& file) {
+    static std::string tabs;
+
+    if (top->parent) {
+        file << tabs << "s.beginGroup(\"" << top->name << "\")" << std::endl;
+    }
+
+    tabs += '\t';
+    for(auto&& s : top->subclasses) {
+        dump_class_settings(s.get(), file);
+    }
+    tabs.erase(0,1);
+
+    tabs += '\t';
+    for(auto&& p : top->properties) {
+        std::string callchain = '_' + top->name;
+        file << tabs << "s.setValue(\"" << camel_case_to_underscore(p->name) << "\",";
+        auto tmp = top->parent;
+        while(tmp->parent ) {
+            std::string s = '_' + tmp->parent->name + "->";
+             callchain.insert(0,s);
+             tmp = tmp->parent;
+        }
+        file << callchain << "->" << p->name << "())" << std::endl;
+    }
+    tabs.erase(0,1);
+    if (top->parent) {
+        file << tabs << "s.endGroup();" << std::endl;
+    } else {
+        file << '}' << std::endl;
+    }
+}
+
 void dump_class_source(MetaClass *top, std::ofstream& file) {
     for(auto&& child : top->subclasses) {
         dump_class_source(child.get(), file);
@@ -241,6 +274,14 @@ void dump_class_source(MetaClass *top, std::ofstream& file) {
         file << std::endl;
     }
 
+    // main preferences class
+    if (!top->parent) {
+        file << "void " << top->name << "::sync()" << std::endl;
+        file << '{' << std::endl;
+        file << "\tQSettings s;" << std::endl;
+
+        dump_class_settings(top, file);
+    }
 }
 
 void dump_class_header(MetaClass *top, std::ofstream& file) {
@@ -316,6 +357,7 @@ void dump_source() {
     source << std::endl;
     dump_class_source(current_class, source);
 }
+
 void show_usage() {
     std::cout << "usage: qobject-compiler if=file.conf of=file.cpp" << std::endl;
 }
