@@ -247,6 +247,18 @@ void dump_class_header(MetaClass *top, std::ofstream& file) {
     file << "};" <<std::endl << std::endl;
 }
 
+void dump_header() {
+    std::ofstream header("test.h");
+    header << "#pragma once" << std::endl;
+    header << std::endl;
+
+    for(auto include : includes) {
+        header << "#include <" << include << ">" << std::endl;
+    }
+    header << std::endl;
+    dump_class_header(current_class, header);
+}
+
 void show_usage() {
     std::cout << "usage: qobject-compiler if=file.conf of=file.cpp" << std::endl;
 }
@@ -272,17 +284,5 @@ int main(int argc, char *argv[]) {
     while( state ) {
         state = state(file);
     }
-
-    // the class-tree is ready.
-    std::ofstream header("test.h");
-    header << "#pragma once" << std::endl;
-    header << std::endl;
-
-    for(auto include : includes) {
-        header << "#include <" << include << ">" << std::endl;
-    }
-    header << std::endl;
-
-    dump_class_header(current_class, header);
-    header.close();
+    dump_header();
 }
