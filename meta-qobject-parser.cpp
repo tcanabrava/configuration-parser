@@ -224,8 +224,38 @@ void dump_class_settings(MetaClass *top, std::ofstream& file) {
     tabs.erase(0,1);
     if (top->parent) {
         file << tabs << "s.endGroup();" << std::endl;
-    } else {
-        file << '}' << std::endl;
+    }
+}
+
+
+void load_class_settings(MetaClass *top, std::ofstream& file) {
+    static std::string tabs;
+
+    if (top->parent) {
+        file << tabs << "s.beginGroup(\"" << top->name << "\")" << std::endl;
+    }
+
+    tabs += '\t';
+    for(auto&& s : top->subclasses) {
+        load_class_settings(s.get(), file);
+    }
+    tabs.erase(0,1);
+
+    tabs += '\t';
+    for(auto&& p : top->properties) {
+        std::string callchain = '_' + top->name;
+        auto tmp = top->parent;
+        while(tmp->parent ) {
+            std::string s = '_' + tmp->parent->name + "->";
+             callchain.insert(0,s);
+             tmp = tmp->parent;
+        }
+        file << tabs << callchain << "->set" << capitalize(p->name,0)
+              << "(s.value(" << camel_case_to_underscore(p->name) << ").value<" << p->type << ">())" << std::endl;
+    }
+    tabs.erase(0,1);
+    if (top->parent) {
+        file << tabs << "s.endGroup();" << std::endl;
     }
 }
 
@@ -281,6 +311,14 @@ void dump_class_source(MetaClass *top, std::ofstream& file) {
         file << "\tQSettings s;" << std::endl;
 
         dump_class_settings(top, file);
+        file << '}' << std::endl;
+
+        file << "void " << top->name << "::load()" << std::endl;
+        file << '{' << std::endl;
+        file << "\tQSettings s;" << std::endl;
+
+        load_class_settings(top, file);
+        file << '}' << std::endl;
     }
 }
 
