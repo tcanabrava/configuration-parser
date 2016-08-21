@@ -195,6 +195,20 @@ callback_t guess_state(std::ifstream& f) {
     return nullptr;
 }
 
+void dump_class_source(MetaClass *top, std::ofstream& file) {
+    for(auto&& child : top->subclasses) {
+        dump_class_source(child.get(), file);
+    }
+
+    file << top->name << "::" << top->name << "(QObject *parent) : QObject(parent)";
+    for(auto&& p : top->properties) {
+        if (p->default_value.size()) {
+            file << ',' << std::endl << '\t' << p->name << '(' << p->default_value << ')';
+        }
+    }
+    file << '{' << std::endl;
+    file << '}' << std::endl;
+}
 void dump_class_header(MetaClass *top, std::ofstream& file) {
     for(auto&& child : top->subclasses) {
         dump_class_header(child.get(), file);
@@ -247,6 +261,7 @@ void dump_class_header(MetaClass *top, std::ofstream& file) {
     file << "};" <<std::endl << std::endl;
 }
 
+//TODO: remember to fix the filenames.
 void dump_header() {
     std::ofstream header("test.h");
     header << "#pragma once" << std::endl;
@@ -259,6 +274,12 @@ void dump_header() {
     dump_class_header(current_class, header);
 }
 
+void dump_source() {
+    std::ofstream source("test.cpp");
+    source << "#include test.h" << std::endl;
+    source << std::endl;
+    dump_class_source(current_class, source);
+}
 void show_usage() {
     std::cout << "usage: qobject-compiler if=file.conf of=file.cpp" << std::endl;
 }
@@ -285,4 +306,5 @@ int main(int argc, char *argv[]) {
         state = state(file);
     }
     dump_header();
+    dump_source();
 }
