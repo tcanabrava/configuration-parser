@@ -219,7 +219,20 @@ void dump_class_source(MetaClass *top, std::ofstream& file) {
         file << '}' << std::endl;
         file << std::endl;
     }
+
+    //set-methods
+    for(auto&& p : top->properties) {
+        file << "void " << top->name << "::set" << capitalize(p->name,0) << '(' << p->type << " value)" << std::endl;
+        file << '{' << std::endl;
+        file << "\tif(rule && !rule(value)" << std::endl;
+        file << "\t\treturn;" << std::endl;
+        file << "\t _" << p->name << " = value;" << std::endl;
+        file << "\temit " << p->name << "Changed(value);" << std::endl;
+        file << '}' << std::endl;
+        file << std::endl;
+    }
 }
+
 void dump_class_header(MetaClass *top, std::ofstream& file) {
     for(auto&& child : top->subclasses) {
         dump_class_header(child.get(), file);
