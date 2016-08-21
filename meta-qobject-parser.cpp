@@ -148,6 +148,7 @@ callback_t state_property(std::ifstream& f) {
             f >> default_value;
         }
         std::cout << "Reading default value =" << default_value << std::endl;
+        property->default_value = default_value;
         return guess_class_state;
     } else {
         return guess_class_state;
