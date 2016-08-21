@@ -200,7 +200,7 @@ void dump_class_settings(MetaClass *top, std::ofstream& file) {
     static std::string tabs;
 
     if (top->parent) {
-        file << tabs << "s.beginGroup(\"" << top->name << "\")" << std::endl;
+        file << tabs << "s.beginGroup(\"" << top->name << "\");" << std::endl;
     }
 
     tabs += '\t';
@@ -214,12 +214,14 @@ void dump_class_settings(MetaClass *top, std::ofstream& file) {
         std::string callchain = '_' + top->name;
         file << tabs << "s.setValue(\"" << camel_case_to_underscore(p->name) << "\",";
         auto tmp = top->parent;
-        while(tmp->parent ) {
-            std::string s = '_' + tmp->parent->name + "->";
-             callchain.insert(0,s);
-             tmp = tmp->parent;
+        if (tmp && tmp->parent) {
+            while(tmp->parent ) {
+                std::string s = '_' + tmp->name + "->";
+                callchain.insert(0,s);
+                tmp = tmp->parent;
+            }
         }
-        file << callchain << "->" << p->name << "())" << std::endl;
+        file << callchain << "->" << p->name << "());" << std::endl;
     }
     tabs.erase(0,1);
     if (top->parent) {
@@ -227,12 +229,11 @@ void dump_class_settings(MetaClass *top, std::ofstream& file) {
     }
 }
 
-
 void load_class_settings(MetaClass *top, std::ofstream& file) {
     static std::string tabs;
 
     if (top->parent) {
-        file << tabs << "s.beginGroup(\"" << top->name << "\")" << std::endl;
+        file << tabs << "s.beginGroup(\"" << top->name << "\");" << std::endl;
     }
 
     tabs += '\t';
@@ -245,13 +246,15 @@ void load_class_settings(MetaClass *top, std::ofstream& file) {
     for(auto&& p : top->properties) {
         std::string callchain = '_' + top->name;
         auto tmp = top->parent;
-        while(tmp->parent ) {
-            std::string s = '_' + tmp->parent->name + "->";
-             callchain.insert(0,s);
-             tmp = tmp->parent;
+        if (tmp && tmp->parent) {
+            while(tmp->parent ) {
+                std::string s = '_' + tmp->name + "->";
+                callchain.insert(0,s);
+                tmp = tmp->parent;
+            }
         }
         file << tabs << callchain << "->set" << capitalize(p->name,0)
-              << "(s.value(" << camel_case_to_underscore(p->name) << ").value<" << p->type << ">())" << std::endl;
+              << "(s.value(\"" << camel_case_to_underscore(p->name) << "\").value<" << p->type << ">());" << std::endl;
     }
     tabs.erase(0,1);
     if (top->parent) {
@@ -268,7 +271,7 @@ void dump_class_source(MetaClass *top, std::ofstream& file) {
     file << top->name << "::" << top->name << "(QObject *parent) : QObject(parent)";
     for(auto&& p : top->properties) {
         if (p->default_value.size()) {
-            file << ',' << std::endl << '\t' << p->name << '(' << p->default_value << ')';
+            file << ',' << std::endl << "\t_" << p->name << '(' << p->default_value << ')';
         }
     }
     file << '{' << std::endl;
@@ -278,7 +281,7 @@ void dump_class_source(MetaClass *top, std::ofstream& file) {
     for(auto&& p : top->properties) {
         file << p->type << ' ' << top->name << "::" << p->name << "() const" << std::endl;
         file << '{' << std::endl;
-        file << "\treturn _" << p->name << std::endl;
+        file << "\treturn _" << p->name << ';' << std::endl;
         file << '}' << std::endl;
         file << std::endl;
     }
@@ -287,7 +290,7 @@ void dump_class_source(MetaClass *top, std::ofstream& file) {
     for(auto&& p : top->properties) {
         file << "void " << top->name << "::set" << capitalize(p->name,0) << '(' << p->type << " value)" << std::endl;
         file << '{' << std::endl;
-        file << "\tif(" << p->name << "Rule && !" << p->name << "Rule(value)" << std::endl;
+        file << "\tif(" << p->name << "Rule && !" << p->name << "Rule(value))" << std::endl;
         file << "\t\treturn;" << std::endl;
         file << "\t _" << p->name << " = value;" << std::endl;
         file << "\temit " << p->name << "Changed(value);" << std::endl;
@@ -323,6 +326,8 @@ void dump_class_source(MetaClass *top, std::ofstream& file) {
 }
 
 void dump_class_header(MetaClass *top, std::ofstream& file) {
+    file << "#include <QObject>" << std::endl;
+
     for(auto&& child : top->subclasses) {
         dump_class_header(child.get(), file);
     }
@@ -371,6 +376,8 @@ void dump_class_header(MetaClass *top, std::ofstream& file) {
     }
 
     if (!top->parent) {
+        file << "\tvoid sync();" <<std::endl;
+        file << "\tvoid load();" <<std::endl;
         file << "\tstatic " << top->name << "* self();" << std::endl;
     }
     file << "};" <<std::endl << std::endl;
@@ -380,6 +387,8 @@ void dump_class_header(MetaClass *top, std::ofstream& file) {
 void dump_header() {
     std::ofstream header("test.h");
     header << "#pragma once" << std::endl;
+    header << "#include <functional>" << std::endl;
+
     header << std::endl;
 
     for(auto include : includes) {
@@ -391,7 +400,8 @@ void dump_header() {
 
 void dump_source() {
     std::ofstream source("test.cpp");
-    source << "#include test.h" << std::endl;
+    source << "#include <test.h>" << std::endl;
+    source << "#include <QSettings>" << std::endl;
     source << std::endl;
     dump_class_source(current_class, source);
 }
