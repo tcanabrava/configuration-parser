@@ -322,6 +322,11 @@ void dump_class_source(MetaClass *top, std::ofstream& file) {
 
         load_class_settings(top, file);
         file << '}' << std::endl;
+        file << top->name << "* " << top->name <<"::self()" << std::endl;
+        file << "{" << std::endl;
+        file << "\tstatic " << top->name << " s;" << std::endl;
+        file << "\treturn &s;" <<std::endl;
+        file << "}" << std::endl;
     }
 }
 
@@ -345,7 +350,7 @@ void dump_class_header(MetaClass *top, std::ofstream& file) {
 
     file << std::endl;
     file << "public:" << std::endl;
-    file <<"\t" << top->name <<"(QObject *parent);" << std::endl;
+    file <<"\t" << top->name <<"(QObject *parent = 0);" << std::endl;
 
     for(auto&& child : top->subclasses) {
         file  << "\t" << child->name << " *_" << child->name << ";" << std::endl;
