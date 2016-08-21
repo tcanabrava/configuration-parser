@@ -224,13 +224,23 @@ void dump_class_source(MetaClass *top, std::ofstream& file) {
     for(auto&& p : top->properties) {
         file << "void " << top->name << "::set" << capitalize(p->name,0) << '(' << p->type << " value)" << std::endl;
         file << '{' << std::endl;
-        file << "\tif(rule && !rule(value)" << std::endl;
+        file << "\tif(" << p->name << "Rule && !" << p->name << "Rule(value)" << std::endl;
         file << "\t\treturn;" << std::endl;
         file << "\t _" << p->name << " = value;" << std::endl;
         file << "\temit " << p->name << "Changed(value);" << std::endl;
         file << '}' << std::endl;
         file << std::endl;
     }
+
+    //rule-methods {
+    for(auto&& p : top->properties) {
+        file << "void " << top->name << "::set" << capitalize(p->name,0) << "Rule(std::function<bool(" << p->type << ")> rule)" << std::endl;
+        file << '{' << std::endl;
+        file << "\t" << p->name << "Rule = rule;" << std::endl;
+        file << '}' << std::endl;
+        file << std::endl;
+    }
+
 }
 
 void dump_class_header(MetaClass *top, std::ofstream& file) {
@@ -260,6 +270,7 @@ void dump_class_header(MetaClass *top, std::ofstream& file) {
     if (top->properties.size()) {
         for(auto&& p : top->properties) {
             file << "\t" << p->type << " " << p->name << "() const;" << std::endl;
+            file << "\t void set" << capitalize(p->name,0) << "Rule(std::function<bool(" << p->type << ")> rule);" << std::endl;
         }
 
         file << std::endl;
@@ -276,6 +287,7 @@ void dump_class_header(MetaClass *top, std::ofstream& file) {
         file <<"private:" <<std::endl;
         for(auto&& p : top->properties) {
             file << "\t" << p->type << " _" << p->name <<";" << std::endl;
+            file << "\t std::function<bool(" << p->type << ")>" << p->name << "Rule;" << std::endl;
         }
     }
 
