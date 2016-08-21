@@ -201,6 +201,7 @@ void dump_class_source(MetaClass *top, std::ofstream& file) {
         dump_class_source(child.get(), file);
     }
 
+    //Constructors.
     file << top->name << "::" << top->name << "(QObject *parent) : QObject(parent)";
     for(auto&& p : top->properties) {
         if (p->default_value.size()) {
@@ -209,6 +210,15 @@ void dump_class_source(MetaClass *top, std::ofstream& file) {
     }
     file << '{' << std::endl;
     file << '}' << std::endl;
+
+    //get - methods.
+    for(auto&& p : top->properties) {
+        file << p->type << ' ' << top->name << "::" << p->name << "() const" << std::endl;
+        file << '{' << std::endl;
+        file << "\treturn _" << p->name << std::endl;
+        file << '}' << std::endl;
+        file << std::endl;
+    }
 }
 void dump_class_header(MetaClass *top, std::ofstream& file) {
     for(auto&& child : top->subclasses) {
