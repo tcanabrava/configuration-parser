@@ -10,7 +10,6 @@ struct MetaProperty {
     std::string name;
     std::string default_value;
     std::string type;
-    std::string setter;
 };
 
 struct MetaClass {
@@ -102,8 +101,24 @@ callback_t state_property(std::ifstream& f) {
 
     property->name = property_name;
     property->type = property_type;
-    if (f.peek() == ':') {
-        f.ignore();
+    if (c == '=') {
+         std::string default_value;
+         f.ignore();
+         clear_empty(f);
+         c = f.peek();
+         //TODO: extract this to a extract string function.
+         // If it's a string.
+         if (c == '"') {
+             char value[256];
+            f.ignore(256, '"');
+            f.getline(value, 256, '"');
+            default_value += '"';
+            default_value += value;
+            default_value += "\"\0";
+        } else {
+            f >> default_value;
+        }
+        std::cout << "Reading default value =" << default_value << std::endl;
         return guess_class_state;
     } else {
         return guess_class_state;
@@ -227,6 +242,14 @@ int main(int argc, char *argv[]) {
 
     // the class-tree is ready.
     std::ofstream header("test.h");
+    header << "#pragma once" << std::endl;
+    header << std::endl;
+
+    for(auto include : includes) {
+        header << "#include <" << include << ">" << std::endl;
+    }
+    header << std::endl;
+
     dump_class_header(current_class, header);
     header.close();
 }
