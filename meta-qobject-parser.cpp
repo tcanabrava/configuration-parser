@@ -270,7 +270,7 @@ void dump_class_header(MetaClass *top, std::ofstream& file) {
     if (top->properties.size()) {
         for(auto&& p : top->properties) {
             file << "\t" << p->type << " " << p->name << "() const;" << std::endl;
-            file << "\t void set" << capitalize(p->name,0) << "Rule(std::function<bool(" << p->type << ")> rule);" << std::endl;
+            file << "\tvoid set" << capitalize(p->name,0) << "Rule(std::function<bool(" << p->type << ")> rule);" << std::endl;
         }
 
         file << std::endl;
@@ -287,7 +287,7 @@ void dump_class_header(MetaClass *top, std::ofstream& file) {
         file <<"private:" <<std::endl;
         for(auto&& p : top->properties) {
             file << "\t" << p->type << " _" << p->name <<";" << std::endl;
-            file << "\t std::function<bool(" << p->type << ")>" << p->name << "Rule;" << std::endl;
+            file << "\tstd::function<bool(" << p->type << ")> " << p->name << "Rule;" << std::endl;
         }
     }
 
