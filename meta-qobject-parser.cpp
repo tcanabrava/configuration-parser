@@ -240,6 +240,10 @@ void dump_class_header(MetaClass *top, std::ofstream& file) {
             file << "\t" << p->type << " _" << p->name <<";" << std::endl;
         }
     }
+
+    if (!top->parent) {
+        file << "\tstatic " << top->name << "* self();" << std::endl;
+    }
     file << "};" <<std::endl << std::endl;
 }
 
