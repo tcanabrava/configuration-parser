@@ -201,10 +201,10 @@ void dump_class_header(MetaClass *top, std::ofstream& file) {
 
     // Q_PROPERTY declarations
     for(auto&& p : top->properties) {
-        file << "Q_PROPERTY(" << p->type << " " << p->name << " READ " << p->name << " WRITE set" << p->name << " NOTIFY " << p->name << "Changed)" << std::endl;
+        file << "Q_PROPERTY(" << p->type << " " << camel_case_to_underscore(p->name) << " READ " << p->name << " WRITE set" << p->name << " NOTIFY " << p->name << "Changed)" << std::endl;
     }
     for(auto&& child : top->subclasses) {
-        file <<"Q_PROPERTY(QObject* " << child->name << " MEMBER _" << child->name << " CONSTANT);" << std::endl;
+        file <<"Q_PROPERTY(QObject* " << camel_case_to_underscore(child->name) << " MEMBER _" << child->name << " CONSTANT);" << std::endl;
     }
 
     file << std::endl;
