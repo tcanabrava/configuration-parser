@@ -27,3 +27,8 @@ template< typename... T > struct RecursiveHelper {
 };
 
 typedef RecursiveHelper<std::ifstream&>::type callback_t;
+
+extern std::string global_string;
+extern std::vector<std::string> includes;
+extern std::unique_ptr<MetaClass> top_level_class;
+extern MetaClass *current_class;
