@@ -29,3 +29,9 @@ std::string capitalize(std::string s, int pos) {
     s[pos] ^= 32;
     return s;
 }
+
+void clear_empty(std::ifstream& f) {
+    while(f.peek() == ' '  || f.peek() == '\n'){
+        f.ignore();
+    }
+}

@@ -1,5 +1,11 @@
 #pragma once
 
+#include <string>
+#include <functional>
+#include <fstream>
+#include <vector>
+#include <memory>
+
 struct MetaProperty {
     std::string name;
     std::string default_value;
