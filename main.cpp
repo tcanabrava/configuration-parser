@@ -6,27 +6,8 @@
 #include <string>
 #include <memory>
 
-struct MetaProperty {
-    std::string name;
-    std::string default_value;
-    std::string type;
-};
-
-struct MetaClass {
-        std::vector<std::unique_ptr<MetaProperty>> properties;
-        std::vector<std::unique_ptr<MetaClass>> subclasses;
-        std::string name;
-        MetaClass *parent;
-};
-
-template< typename... T > struct RecursiveHelper {
-    typedef std::function< RecursiveHelper(T...) > type;
-    RecursiveHelper( type f ) : func(f) {}
-    operator type () { return func; }
-    type func;
-};
-
-typedef RecursiveHelper<std::ifstream&>::type callback_t;
+#include "meta-settings.h"
+#include "string-helpers.h"
 
 bool global_debug = false;
 std::string global_string;
@@ -38,35 +19,6 @@ callback_t guess_state(std::ifstream& f);
 void clear_empty(std::ifstream& f);
 callback_t guess_class_state(std::ifstream& f);
 
-std::string camel_case_to_underscore(std::string s) {
-    std::string ret;
-    for(char x : s){
-        if (x >= 'A' && x <= 'Z') {
-            ret += '_';
-            ret += (char) (x | 32);
-        } else {
-            ret += x;
-        }
-    }
-    return ret;
-}
-
-std::string underscore_to_camel_case(std::string s) {
-    std::string ret;
-    for(int i = 0, end = s.size(); i < end; ++i) {
-        if (s[i] == '_' && i != end) {
-            s[i+1] ^= 32;
-            continue;
-        }
-        ret += s[i];
-    }
-    return ret;
-}
-
-std::string capitalize(std::string s, int pos) {
-    s[pos] ^= 32;
-    return s;
-}
 callback_t state_include(std::ifstream& f) {
     char include_name[80];
     f.ignore(256, '<');
