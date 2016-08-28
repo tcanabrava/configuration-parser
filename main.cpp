@@ -269,6 +269,9 @@ void dump_class_source(MetaClass *top, std::ofstream& file) {
 
     //Constructors.
     file << top->name << "::" << top->name << "(QObject *parent) : QObject(parent)";
+    for(auto&& c : top->subclasses) {
+        file << ',' << std::endl << "\t_" << c->name << "(new " << c->name << "(this))";
+    }
     for(auto&& p : top->properties) {
         if (p->default_value.size()) {
             file << ',' << std::endl << "\t_" << p->name << '(' << p->default_value << ')';
