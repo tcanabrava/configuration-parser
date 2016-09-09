@@ -2,36 +2,6 @@
 
 #include <iostream>
 
-
-std::string global_string;
-std::vector<std::string> includes;
-std::unique_ptr<MetaClass> top_level_class = nullptr;
-MetaClass *current_class = nullptr;
-
-callback_t state_class(std::ifstream& f) {
-    std::cout << "Starting class: " << global_string << std::endl;
-    f.ignore();
-    if (!top_level_class) {
-        top_level_class = std::make_unique<MetaClass>();
-        current_class = top_level_class.get();
-        current_class->parent = nullptr;
-    } else {
-        MetaClass *old_parent = current_class;
-        current_class->subclasses.push_back(std::make_unique<MetaClass>());
-        current_class = current_class->subclasses.back().get();
-        current_class->parent = old_parent;
-    }
-    current_class->name  = global_string;
-    global_string.clear();
-    return guess_class_state;;
-}
-
-callback_t state_string(std::ifstream& f) {
-    f >> global_string;
-//    std::cout << "string added: " << global_string << std::endl;
-    return guess_state;
-}
-
 callback_t state_end_class(std::ifstream& f) {
     f.ignore();
     std::cout << "class finished: " << current_class->name << std::endl;
@@ -106,27 +76,5 @@ callback_t guess_class_state(std::ifstream& f) {
     return nullptr;
 }
 
-callback_t guess_state(std::ifstream& f) {
-    char c = f.peek();
-    switch(c) {
-        case '#' : return state_include;
-        case '{' : return state_class;
-        case '}' : return state_end_class;
-        case EOF : return nullptr;
-        case ' ' :
-        case '\n' :
-            clear_empty(f);
-            return guess_state;
-        default : return state_string;
-    }
-    return nullptr;
-}
 
-callback_t state_include(std::ifstream& f) {
-    char include_name[80];
-    f.ignore(256, '<');
-    f.getline(include_name, 80, '>'); // read untill >
-    includes.push_back(include_name);
-    std::cout << "include added: " << include_name << std::endl;
-    return guess_state;
-}
+

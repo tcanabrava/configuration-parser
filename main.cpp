@@ -21,7 +21,7 @@ int main(int argc, char *argv[]) {
         return 0;
     }
 
-    callback_t state = guess_state;
+    callback_t state = initial_state;
     std::cout << "file to read: " << argv[1] << std::endl;
 
     std::ifstream file("test.conf");

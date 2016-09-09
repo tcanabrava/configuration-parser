@@ -1,6 +1,7 @@
 #include "dump-settings.h"
 #include "meta-settings.h"
 #include "string-helpers.h"
+#include <cassert>
 
 void dump_class_settings(MetaClass *top, std::ofstream& file) {
     static std::string tabs;
@@ -209,7 +210,9 @@ void dump_header() {
         header << "#include <" << include << ">" << std::endl;
     }
     header << std::endl;
-    dump_class_header(current_class, header);
+    auto curr = dynamic_cast<MetaClass*>(current_object);
+    assert(curr != 0);
+    dump_class_header(curr, header);
 }
 
 void dump_source() {
@@ -217,5 +220,7 @@ void dump_source() {
     source << "#include <test.h>" << std::endl;
     source << "#include <QSettings>" << std::endl;
     source << std::endl;
-    dump_class_source(current_class, source);
+    auto curr = dynamic_cast<MetaClass*>(current_object);
+    assert(curr != 0);
+    dump_class_source(curr, source);
 }
