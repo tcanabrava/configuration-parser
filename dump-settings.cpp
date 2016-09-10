@@ -210,9 +210,8 @@ void dump_header(const std::string& filename) {
         header << "#include <" << include << ">" << std::endl;
     }
     header << std::endl;
-    auto curr = dynamic_cast<MetaClass*>(current_object);
-    if (curr)
-        dump_class_header(curr, header);
+    if (top_level_class)
+        dump_class_header(top_level_class.get(), header);
 }
 
 void dump_source(const std::string& filename) {
