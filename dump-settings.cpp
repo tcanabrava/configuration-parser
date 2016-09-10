@@ -211,8 +211,8 @@ void dump_header(const std::string& filename) {
     }
     header << std::endl;
     auto curr = dynamic_cast<MetaClass*>(current_object);
-    assert(curr != 0);
-    dump_class_header(curr, header);
+    if (curr)
+        dump_class_header(curr, header);
 }
 
 void dump_source(const std::string& filename) {
