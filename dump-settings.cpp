@@ -199,8 +199,8 @@ void dump_class_header(MetaClass *top, std::ofstream& file) {
 }
 
 //TODO: remember to fix the filenames.
-void dump_header() {
-    std::ofstream header("test.h");
+void dump_header(const std::string& filename) {
+    std::ofstream header(filename);
     header << "#pragma once" << std::endl;
     header << "#include <functional>" << std::endl;
 
@@ -215,8 +215,8 @@ void dump_header() {
     dump_class_header(curr, header);
 }
 
-void dump_source() {
-    std::ofstream source("test.cpp");
+void dump_source(const std::string& filename) {
+    std::ofstream source(filename);
     source << "#include <test.h>" << std::endl;
     source << "#include <QSettings>" << std::endl;
     source << std::endl;

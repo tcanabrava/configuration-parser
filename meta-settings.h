@@ -10,10 +10,12 @@
 struct Meta {
 public:
     virtual ~Meta(){}
+    Meta *parent;
+    std::string name;
+    bool is_array;
 };
 
 struct MetaProperty : public Meta {
-    std::string name;
     std::string default_value;
     std::string type;
 };
@@ -21,8 +23,6 @@ struct MetaProperty : public Meta {
 struct MetaClass : public Meta {
         std::vector<std::unique_ptr<MetaProperty>> properties;
         std::vector<std::unique_ptr<MetaClass>> subclasses;
-        std::string name;
-        MetaClass *parent;
 };
 
 template< typename... T > struct RecursiveHelper {

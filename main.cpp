@@ -33,6 +33,6 @@ int main(int argc, char *argv[]) {
     while( state ) {
         state = state(file);
     }
-    dump_header();
-    dump_source();
+    dump_header("blah");
+    dump_source("blah");
 }

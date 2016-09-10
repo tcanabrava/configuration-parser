@@ -8,6 +8,9 @@ callback_t initial_state(std::ifstream& f);
 /* handles the definition of new classes */
 callback_t begin_class_state(std::ifstream& f);
 
+/* deals with the internals of a new class */
+callback_t class_state(std::ifstream& f);
+
 /* finishes the current class */
 callback_t end_class_state(std::ifstream& f);
 
