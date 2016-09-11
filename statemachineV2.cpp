@@ -12,7 +12,7 @@ MetaClass *current_class;
 std::string global_string;
 std::string last_comment;
 bool should_be_array;
-int array_value;
+std::string array_value;
 std::vector<std::string> includes;
 std::unique_ptr<MetaClass> top_level_class = nullptr;
 
@@ -103,7 +103,8 @@ callback_t begin_class_state(std::ifstream& f) {
     current_class->is_array = should_be_array;
     should_be_array = false;
 
-    std::cout << "class found: " << current_class->name << ", is_array = " << current_class->is_array << std::endl;
+    std::cout << "class found: " << current_class->name << ", is_array = " << current_class->is_array
+              <<", value = " << array_value << std::endl;
 
     global_string.clear();
     return class_state;
@@ -137,11 +138,15 @@ callback_t array_state(std::ifstream& f) {
         clear_empty(f);
         char c = f.peek();
         if (c >= '0' && c <= '9') {
-            // TODO: read the number,
+            char value[10];
+            f.getline(value, 10, ']');
+            array_value = value;
+            return end_array_state;
         } else if (c == ']') {
             return end_array_state;
         }
-
+        //TODO: error handling.
+        return nullptr;
 }
 
 callback_t end_array_state(std::ifstream& f) {
