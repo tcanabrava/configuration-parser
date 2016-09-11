@@ -5,6 +5,7 @@
 #include <fstream>
 #include <vector>
 #include <memory>
+#include <map>
 
 // Used only to be able to dynamic cast.
 struct Meta {
@@ -18,6 +19,7 @@ public:
 struct MetaProperty : public Meta {
     std::string default_value;
     std::string type;
+    std::map<std::string, std::string> setters;
 };
 
 struct MetaClass : public Meta {

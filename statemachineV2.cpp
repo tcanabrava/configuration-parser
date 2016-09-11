@@ -26,6 +26,15 @@ callback_t state_include(std::ifstream& f) {
     std::cout << "include added: " << include_name << std::endl;
     return initial_state;
 }
+/* property types:
+ * type name
+ * type name = value
+ * type name = {
+ *      value = v
+ *      max = blah
+ *      min = bleh
+ * }
+ */
 
 callback_t multi_purpose_string_state(std::ifstream& f) {
     std::vector<char> delimiters = {'{', '[', '=', ' ', '\n' };
@@ -121,7 +130,48 @@ callback_t end_class_state(std::ifstream& f) {
 
 callback_t begin_property_state(std::ifstream& f)
 {
+    // here we know that we have at least the type of the property,
+    // but it can be three kinds of string.
+    std::string property_name;
+    clear_empty(f);
+    current_property = new MetaProperty();
+    current_property->type = global_string;
+    current_property->parent = current_class;
+
+    // find the name of the property
+    std::vector<char> delimiters = {'=', '\n' };
+    while(std::find(delimiters.begin(), delimiters.end(), f.peek()) == delimiters.end()) {
+        property_name += f.get();
+    }
+    current_property->name = property_name;
+
+    // find next userfull tocken:
+    while(f.peek() != '\n' || f.peek() != '=') {
+        f.ignore();
+    }
+
+    // easy, line finished, next property or class.
+    if (f.peek() == '\n') {
+        current_property = nullptr;
+        return class_state;
+    } else if (f.peek() == '='){
+        f.ignore();
+        clear_empty(f);
+        if (f.peek() == '{') {
+            return begin_property_set_state;
+        } else {
+            char buffer[80];
+            f.getline(buffer,80, '\n');
+            current_property->default_value = buffer;
+        }
+    }
+
+
     return nullptr;
+}
+
+callback_t begin_property_set_state(std::ifstream& f) {
+
 }
 
 callback_t property_state(std::ifstream& f) {
