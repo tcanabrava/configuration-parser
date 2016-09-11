@@ -17,11 +17,16 @@ callback_t end_class_state(std::ifstream& f);
 /* handles the creation of properties for the current class */
 callback_t begin_property_state(std::ifstream& f);
 
+callback_t property_state(std::ifstream& f);
+
 /* finishes the current property */
 callback_t end_property_state(std::ifstream& f);
 
 /* marks the current object (which can be a property or a class) as an array. */
 callback_t begin_array_state(std::ifstream& f);
+
+/* reads the contents of the array */
+callback_t array_state(std::ifstream& f);
 
 /* finishes the array. */
 callback_t end_array_state(std::ifstream& f);

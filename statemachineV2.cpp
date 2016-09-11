@@ -10,6 +10,7 @@ MetaProperty *current_property;
 MetaClass *current_class;
 
 std::string global_string;
+std::string last_comment;
 bool should_be_array;
 int array_value;
 std::vector<std::string> includes;
@@ -49,7 +50,22 @@ callback_t guess_documentation_state(std::ifstream& f) {
 }
 
 callback_t multi_line_documentation_state(std::ifstream& f) {
-    return nullptr;
+    std::string comment;
+    char c;
+    while(f.peek() != EOF) {
+        c = f.get();
+        if (c == '*' && f.peek() == '/') {
+            goto exit;
+        }
+        comment += c;
+    }
+    last_comment = comment;
+
+    exit:
+    return current_property ? property_state
+            : current_class ? class_state
+            : initial_state;
+
 }
 
 callback_t single_line_documentation_state(std::ifstream& f) {
@@ -107,8 +123,36 @@ callback_t begin_property_state(std::ifstream& f)
     return nullptr;
 }
 
+callback_t property_state(std::ifstream& f) {
+
+}
+
 callback_t begin_array_state(std::ifstream& f) {
-    return nullptr;
+    f.ignore();
+    should_be_array = true;
+    return array_state;
+}
+
+callback_t array_state(std::ifstream& f) {
+        clear_empty(f);
+        char c = f.peek();
+        if (c >= '0' && c <= '9') {
+            // TODO: read the number,
+        } else if (c == ']') {
+            return end_array_state;
+        }
+
+}
+
+callback_t end_array_state(std::ifstream& f) {
+    f.ignore();
+    //TODO: Property State Handling.
+    //     if (current_property) {
+    //         return property_state;
+    //     }
+    if (current_class) {
+        return class_state;
+    }
 }
 
 /* Start the default stuff -- classes,  includes and documentation. */
