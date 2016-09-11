@@ -172,7 +172,35 @@ callback_t begin_property_state(std::ifstream& f)
 }
 
 callback_t begin_property_set_state(std::ifstream& f) {
+    std::string name;
+    std::string value;
+    std::string tmp;
+    f.ignore(); // ignoring {
 
+    do {
+        f >> name;
+        if (name == "}")
+            break;
+
+        f >> tmp;
+        if (tmp == "}")
+            break;
+
+        f >> value;
+        if (value == "}")
+            break;
+
+        if (name == "value") {
+            std::cout << "found value for property  "  << value;
+            current_property->default_value = value;
+        } else {
+            std::cout << "fount setter " << name << " with value " << value;
+            current_property->setters.insert(std::make_pair(name,value));
+        }
+        std::cout << std::endl;
+    } while(true);
+    current_object = nullptr;
+    return class_state;
 }
 
 callback_t property_state(std::ifstream& f) {
