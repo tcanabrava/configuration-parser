@@ -26,15 +26,6 @@ callback_t state_include(std::ifstream& f) {
     std::cout << "include added: " << include_name << std::endl;
     return initial_state;
 }
-/* property types:
- * type name
- * type name = value
- * type name = {
- *      value = v
- *      max = blah
- *      min = bleh
- * }
- */
 
 callback_t multi_purpose_string_state(std::ifstream& f) {
     std::vector<char> delimiters = {'{', '[', '=', ' ', '\n' };
