@@ -132,11 +132,14 @@ callback_t begin_property_state(std::ifstream& f)
 {
     // here we know that we have at least the type of the property,
     // but it can be three kinds of string.
+
     std::string property_name;
     clear_empty(f);
+
     current_property = new MetaProperty();
     current_property->type = global_string;
     current_property->parent = current_class;
+    global_string.clear();
 
     // find the name of the property
     std::vector<char> delimiters = {'=', '\n' };
@@ -144,27 +147,34 @@ callback_t begin_property_state(std::ifstream& f)
         property_name += f.get();
     }
     current_property->name = property_name;
+    std::cout << "Starting property " << property_name << " ";
 
     // find next userfull tocken:
-    while(f.peek() != '\n' || f.peek() != '=') {
+    while(f.peek() != '\n' && f.peek() != '=') {
         f.ignore();
     }
 
     // easy, line finished, next property or class.
     if (f.peek() == '\n') {
         current_property = nullptr;
+        std::cout << "finishing property" << std::endl;
         return class_state;
     } else if (f.peek() == '='){
         f.ignore();
         clear_empty(f);
         if (f.peek() == '{') {
+            std::cout << "starting the set property set" << std::endl;
             return begin_property_set_state;
         } else {
             char buffer[80];
             f.getline(buffer,80, '\n');
             current_property->default_value = buffer;
+            std::cout << "value = " << current_property->default_value << std::endl;
+            current_property = nullptr;
+            return class_state;
         }
     }
+    std::cout << std::endl;
 
 
     return nullptr;
