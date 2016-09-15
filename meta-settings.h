@@ -34,7 +34,7 @@ template< typename... T > struct RecursiveHelper {
     type func;
 };
 
-typedef RecursiveHelper<std::ifstream&>::type callback_t;
+typedef RecursiveHelper<std::ifstream&,int&>::type callback_t;
 
 extern std::string global_string;
 extern std::vector<std::string> includes;

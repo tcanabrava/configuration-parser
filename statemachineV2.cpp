@@ -18,7 +18,7 @@ std::unique_ptr<MetaClass> top_level_class = nullptr;
 
 
 /* reads #include directives. */
-callback_t state_include(std::ifstream& f) {
+callback_t state_include(std::ifstream& f, int& error) {
     char include_name[80];
     f.ignore(256, '<');
     f.getline(include_name, 80, '>'); // read untill >
@@ -27,7 +27,7 @@ callback_t state_include(std::ifstream& f) {
     return initial_state;
 }
 
-callback_t multi_purpose_string_state(std::ifstream& f) {
+callback_t multi_purpose_string_state(std::ifstream& f, int& error) {
     std::vector<char> delimiters = {'{', '[', '=', ' ', '\n' };
     while(std::find(delimiters.begin(), delimiters.end(), f.peek()) == delimiters.end()) {
         global_string += f.get();
@@ -39,7 +39,7 @@ callback_t multi_purpose_string_state(std::ifstream& f) {
         :  initial_state;
 }
 
-callback_t guess_documentation_state(std::ifstream& f) {
+callback_t guess_documentation_state(std::ifstream& f, int& error) {
         f.ignore();
         char c = f.peek();
         switch(c) {
@@ -49,7 +49,7 @@ callback_t guess_documentation_state(std::ifstream& f) {
         return nullptr;
 }
 
-callback_t multi_line_documentation_state(std::ifstream& f) {
+callback_t multi_line_documentation_state(std::ifstream& f, int& error) {
     std::string comment;
     char c;
     while(f.peek() != EOF) {
@@ -68,11 +68,11 @@ callback_t multi_line_documentation_state(std::ifstream& f) {
 
 }
 
-callback_t single_line_documentation_state(std::ifstream& f) {
+callback_t single_line_documentation_state(std::ifstream& f, int& error) {
     return nullptr;
 }
 
-MetaClass *parent_class(Meta *object) {
+MetaClass *parent_class(Meta *object, int& error) {
         while(object != nullptr) {
             auto ptr = dynamic_cast<MetaClass*>(object);
             if (ptr)
@@ -82,7 +82,7 @@ MetaClass *parent_class(Meta *object) {
         return nullptr;
 }
 
-callback_t begin_class_state(std::ifstream& f) {
+callback_t begin_class_state(std::ifstream& f, int& error) {
     std::cout << "Starting class: " << global_string << std::endl;
 
     f.ignore(); // eat the '{' character.
@@ -110,7 +110,7 @@ callback_t begin_class_state(std::ifstream& f) {
     return class_state;
 }
 
-callback_t end_class_state(std::ifstream& f) {
+callback_t end_class_state(std::ifstream& f, int& error) {
     f.ignore();
     std::cout << "finishing class " << current_class->name << std::endl;
     current_class = static_cast<MetaClass*>(current_class-> parent);
@@ -119,7 +119,7 @@ callback_t end_class_state(std::ifstream& f) {
     return nullptr;
 }
 
-callback_t begin_property_state(std::ifstream& f)
+callback_t begin_property_state(std::ifstream& f, int& error)
 {
     // here we know that we have at least the type of the property,
     // but it can be three kinds of string.
@@ -143,7 +143,7 @@ callback_t begin_property_state(std::ifstream& f)
 }
 
 
-callback_t begin_property_set_state(std::ifstream& f) {
+callback_t begin_property_set_state(std::ifstream& f, int& error) {
     std::string name;
     std::string value;
     std::string tmp;
@@ -175,7 +175,7 @@ callback_t begin_property_set_state(std::ifstream& f) {
     return class_state;
 }
 
-callback_t property_state(std::ifstream& f) {
+callback_t property_state(std::ifstream& f, int& error) {
     while(f.peek() != '\n' && f.peek() != '=' && f.peek() != '[') {
         f.ignore();
     }
@@ -206,13 +206,13 @@ callback_t property_state(std::ifstream& f) {
     std::cout << std::endl;
 }
 
-callback_t begin_array_state(std::ifstream& f) {
+callback_t begin_array_state(std::ifstream& f, int& error) {
     f.ignore();
     should_be_array = true;
     return array_state;
 }
 
-callback_t array_state(std::ifstream& f) {
+callback_t array_state(std::ifstream& f, int& error) {
         clear_empty(f);
         char c = f.peek();
         if (c >= '0' && c <= '9') {
@@ -227,7 +227,7 @@ callback_t array_state(std::ifstream& f) {
         return nullptr;
 }
 
-callback_t end_array_state(std::ifstream& f) {
+callback_t end_array_state(std::ifstream& f, int& error) {
     f.ignore();
     if (current_property) {
         return property_state;
@@ -238,7 +238,7 @@ callback_t end_array_state(std::ifstream& f) {
 }
 
 /* Start the default stuff -- classes,  includes and documentation. */
-callback_t initial_state(std::ifstream& f) {
+callback_t initial_state(std::ifstream& f, int& error) {
     clear_empty(f);
 
     char c = f.peek();
@@ -255,7 +255,7 @@ callback_t initial_state(std::ifstream& f) {
 }
 
 /* starts the class stuff */
-callback_t class_state(std::ifstream& f) {
+callback_t class_state(std::ifstream& f, int& error) {
     clear_empty(f);
     char c = f.peek();
     switch(c) {

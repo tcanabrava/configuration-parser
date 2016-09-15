@@ -20,7 +20,7 @@ int main(int argc, char *argv[]) {
         show_usage();
         return 0;
     }
-
+    int error;
     callback_t state = initial_state;
     std::cout << "file to read: " << argv[1] << std::endl;
 
@@ -31,7 +31,7 @@ int main(int argc, char *argv[]) {
 
     // Start the state machine
     while( state ) {
-        state = state(file);
+        state = state(file, error);
     }
     dump_header("blah");
     dump_source("blah");

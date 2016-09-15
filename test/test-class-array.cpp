@@ -10,9 +10,10 @@ int main() {
     callback_t state = initial_state;
     std::string filename("test-class-array.conf");
     std::ifstream file(filename);
+    int error;
 
     while( state ) {
-        state = state(file);
+        state = state(file, error);
     }
 
     dump_header("test-class-array.h");
