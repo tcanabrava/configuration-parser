@@ -7,23 +7,16 @@ endmacro()
 enable_testing()
 add_definitions(-g)
 
-TEST(TestIncludes test-includes.cpp)
-TEST(TestEmptyClass test-empty-class.cpp)
-TEST(TestScoppedPreferences test-scopped-preferences.cpp)
-TEST(TestClassArray test-class-array.cpp)
-TEST(TestProperties test-properties.cpp)
+TEST(unittests unittests.cpp)
 
 add_custom_target(check COMMAND ${CMAKE_CTEST_COMMAND}
 	DEPENDS
         pre-check
-	TestIncludes
-	TestEmptyClass
-	TestScoppedPreferences
-	TestClassArray
-	TestProperties
+        unittests
 )
 
 file(GLOB TESTS *.conf)
+file(GLOB RESULTS *.expected)
 
-add_custom_target(pre-check  COMMAND cp ${TESTS} ${CMAKE_BINARY_DIR}/test)
+add_custom_target(pre-check  COMMAND cp ${TESTS} ${RESULTS} ${CMAKE_BINARY_DIR}/test)
 

@@ -32,6 +32,7 @@ int main(int argc, char *argv[]) {
     // Start the state machine
     while( state ) {
         state = state(file, error);
+
     }
     dump_header("blah");
     dump_source("blah");
