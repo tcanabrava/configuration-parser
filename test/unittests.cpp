@@ -9,7 +9,7 @@
 #include "dump-settings.h"
 
 int test_file(const std::string& filename) {
-    std::ifstream file(filename);
+    std::ifstream file(filename + ".conf");
     int error;
 
     callback_t state = initial_state;
@@ -41,7 +41,7 @@ int test_file(const std::string& filename) {
             generated >> gen;
             expected >> exp;
             if (gen != exp) {
-                std::cout << "Error at" << exp;
+                std::cout << "Error at " << exp;
                 return -1;
             }
         }

@@ -141,7 +141,6 @@ void dump_class_source(MetaClass *top, std::ofstream& file) {
 }
 
 void dump_class_header(MetaClass *top, std::ofstream& file) {
-    file << "#include <QObject>" << std::endl;
 
     for(auto&& child : top->subclasses) {
         dump_class_header(child.get(), file);
@@ -202,7 +201,9 @@ void dump_class_header(MetaClass *top, std::ofstream& file) {
 void dump_header(const std::string& filename) {
     std::ofstream header(filename);
     header << "#pragma once" << std::endl;
+    header << std::endl;
     header << "#include <functional>" << std::endl;
+    header << "#include <QObject>" << std::endl;
 
     header << std::endl;
 
