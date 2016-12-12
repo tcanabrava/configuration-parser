@@ -16,6 +16,16 @@ using namespace boost;
 using boost::filesystem::directory_entry;
 using boost::filesystem::directory_iterator;
 
+bool check_file_exists(std::string filename, const std::vector<std::string>& extensions) {
+    for(const auto& extension : extensions) {
+        if(!filesystem::exists(filename + extension)) {
+            std::cerr << "Filename informed doesn't exists: " << filename;
+            return false;
+        }
+    }
+    return true;
+}
+
 int test_file(const std::string& filename) {
     std::ifstream file(filename + ".conf");
     int error;
@@ -25,8 +35,8 @@ int test_file(const std::string& filename) {
         state = state(file, error);
     }
 
-    dump_header(filename + ".h");
-    {
+    if (check_file_exists(filename, {".h", "-header.expected"})) {
+        dump_header(filename + ".h");
         std::ifstream generated(filename + ".h");
         std::ifstream expected(filename + "-header.expected");
         std::string gen, exp;
@@ -40,8 +50,8 @@ int test_file(const std::string& filename) {
         }
     }
 
-    dump_source(filename + ".cpp");
-    {
+    if (check_file_exists(filename, {".cpp", "-source.expected"})) {
+        dump_source(filename + ".cpp");
         std::ifstream generated(filename + ".cpp");
         std::ifstream expected(filename + "-source.expected");
         std::string gen, exp;
@@ -54,6 +64,7 @@ int test_file(const std::string& filename) {
             }
         }
     }
+    return 0;
 }
 
 std::vector<std::string> find_filenames(int argc, char *argv[]) {
