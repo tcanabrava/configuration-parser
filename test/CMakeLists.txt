@@ -2,7 +2,7 @@ find_package(Boost COMPONENTS filesystem system REQUIRED)
 
 macro(TEST NAME FILE)
 	add_executable(${NAME} ${FILE} )
-	target_link_libraries(${NAME} ${Boost_LIBRARIES} parser )
+	target_link_libraries(${NAME} ${Boost_LIBRARIES} parser Qt5::Core)
 	add_test(NAME ${NAME} COMMAND  $<TARGET_FILE:${NAME}>)
 endmacro()
 
