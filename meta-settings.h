@@ -12,7 +12,7 @@ struct MetaProperty;
 
 struct MetaProperty {
     typedef std::unique_ptr<MetaProperty> Ptr;
-    MetaClass *parent;
+    std::shared_ptr<MetaClass> parent;
     std::string name;
     std::string default_value;
     std::string type;
@@ -20,11 +20,11 @@ struct MetaProperty {
 };
 
 struct MetaClass {
-    typedef std::unique_ptr<MetaClass> Ptr;
+    typedef std::shared_ptr<MetaClass> Ptr;
     std::vector<MetaProperty::Ptr> properties;
     std::vector<Ptr> subclasses;
 
-    MetaClass *parent;
+    std::shared_ptr<MetaClass> parent;
     std::string name;
     bool is_array;
 };
@@ -40,4 +40,4 @@ typedef RecursiveHelper<std::ifstream&,int&>::type callback_t;
 
 extern std::string global_string;
 extern std::vector<std::string> includes;
-extern std::unique_ptr<MetaClass> top_level_class;
+extern std::shared_ptr<MetaClass> top_level_class;

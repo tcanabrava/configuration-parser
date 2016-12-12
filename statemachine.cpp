@@ -5,15 +5,15 @@
 #include <boost/algorithm/string.hpp>
 #include "string-helpers.h"
 
-MetaProperty *current_property;
-MetaClass *current_class;
+std::shared_ptr<MetaProperty> current_property;
+std::shared_ptr<MetaClass> current_class;
 
 std::string global_string;
 std::string last_comment;
 bool should_be_array;
 std::string array_value;
 std::vector<std::string> includes;
-std::unique_ptr<MetaClass> top_level_class = nullptr;
+std::shared_ptr<MetaClass> top_level_class = nullptr;
 
 /* reads #include directives. */
 callback_t state_include(std::ifstream& f, int& error) {
@@ -78,13 +78,13 @@ callback_t begin_class_state(std::ifstream& f, int& error) {
     boost::trim(global_string);
 
     if (!top_level_class) {
-        top_level_class = std::make_unique<MetaClass>();
+        top_level_class = std::make_shared<MetaClass>();
         top_level_class->parent = nullptr;
-        current_class = top_level_class.get();
+        current_class = top_level_class;
     } else {
-        auto *old_parent = current_class;
-        current_class->subclasses.push_back(std::make_unique<MetaClass>());
-        current_class = current_class->subclasses.back().get();
+        auto old_parent = current_class;
+        current_class->subclasses.push_back(std::make_shared<MetaClass>());
+        current_class = current_class->subclasses.back();
         current_class->parent = old_parent;
     }
     current_class->name  = global_string;
@@ -101,7 +101,7 @@ callback_t begin_class_state(std::ifstream& f, int& error) {
 callback_t end_class_state(std::ifstream& f, int& error) {
     f.ignore();
     std::cout << "finishing class " << current_class->name << std::endl;
-    current_class = static_cast<MetaClass*>(current_class-> parent);
+    current_class = current_class->parent;
     if (current_class)
         return class_state;
     return nullptr;
@@ -115,7 +115,7 @@ callback_t begin_property_state(std::ifstream& f, int& error)
     std::string property_name;
     clear_empty(f);
 
-    current_property = new MetaProperty();
+    current_property = std::make_shared<MetaProperty>();
     current_property->type = global_string;
     current_property->parent = current_class;
     global_string.clear();
@@ -218,10 +218,10 @@ callback_t end_array_state(std::ifstream& f, int& error) {
     f.ignore();
     if (current_property) {
         return property_state;
-    }
-    if (current_class) {
+    } else if (current_class) {
         return class_state;
     }
+    return nullptr;
 }
 
 /* Start the default stuff -- classes,  includes and documentation. */
