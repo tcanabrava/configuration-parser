@@ -1,6 +1,8 @@
+find_package(Boost COMPONENTS filesystem system REQUIRED)
+
 macro(TEST NAME FILE)
 	add_executable(${NAME} ${FILE} )
-	target_link_libraries(${NAME} parser)
+	target_link_libraries(${NAME} ${Boost_LIBRARIES} parser )
 	add_test(NAME ${NAME} COMMAND  $<TARGET_FILE:${NAME}>)
 endmacro()
 
@@ -19,4 +21,3 @@ file(GLOB TESTS *.conf)
 file(GLOB RESULTS *.expected)
 
 add_custom_target(pre-check  COMMAND cp ${TESTS} ${RESULTS} ${CMAKE_BINARY_DIR}/test)
-
