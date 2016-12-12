@@ -222,7 +222,5 @@ void dump_source(const std::string& filename) {
     source << "#include <test.h>" << std::endl;
     source << "#include <QSettings>" << std::endl;
     source << std::endl;
-    auto curr = dynamic_cast<MetaClass*>(current_object);
-    assert(curr != 0);
-    dump_class_source(curr, source);
+    // something based on dump_header here.
 }

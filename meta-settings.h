@@ -7,24 +7,26 @@
 #include <memory>
 #include <map>
 
-// Used only to be able to dynamic cast.
-struct Meta {
-public:
-    virtual ~Meta(){}
-    Meta *parent;
-    std::string name;
-    bool is_array;
-};
+struct MetaClass;
+struct MetaProperty;
 
-struct MetaProperty : public Meta {
+struct MetaProperty {
+    typedef std::unique_ptr<MetaProperty> Ptr;
+    MetaClass *parent;
+    std::string name;
     std::string default_value;
     std::string type;
     std::map<std::string, std::string> setters;
 };
 
-struct MetaClass : public Meta {
-        std::vector<std::unique_ptr<MetaProperty>> properties;
-        std::vector<std::unique_ptr<MetaClass>> subclasses;
+struct MetaClass {
+    typedef std::unique_ptr<MetaClass> Ptr;
+    std::vector<MetaProperty::Ptr> properties;
+    std::vector<Ptr> subclasses;
+
+    MetaClass *parent;
+    std::string name;
+    bool is_array;
 };
 
 template< typename... T > struct RecursiveHelper {
@@ -39,4 +41,3 @@ typedef RecursiveHelper<std::ifstream&,int&>::type callback_t;
 extern std::string global_string;
 extern std::vector<std::string> includes;
 extern std::unique_ptr<MetaClass> top_level_class;
-extern Meta *current_object;

@@ -5,7 +5,6 @@
 #include <boost/algorithm/string.hpp>
 #include "string-helpers.h"
 
-Meta *current_object;
 MetaProperty *current_property;
 MetaClass *current_class;
 
@@ -15,7 +14,6 @@ bool should_be_array;
 std::string array_value;
 std::vector<std::string> includes;
 std::unique_ptr<MetaClass> top_level_class = nullptr;
-
 
 /* reads #include directives. */
 callback_t state_include(std::ifstream& f, int& error) {
@@ -70,16 +68,6 @@ callback_t multi_line_documentation_state(std::ifstream& f, int& error) {
 
 callback_t single_line_documentation_state(std::ifstream& f, int& error) {
     return nullptr;
-}
-
-MetaClass *parent_class(Meta *object, int& error) {
-        while(object != nullptr) {
-            auto ptr = dynamic_cast<MetaClass*>(object);
-            if (ptr)
-                return ptr;
-            object = object->parent;
-        }
-        return nullptr;
 }
 
 callback_t begin_class_state(std::ifstream& f, int& error) {
@@ -171,7 +159,6 @@ callback_t begin_property_set_state(std::ifstream& f, int& error) {
         }
         std::cout << std::endl;
     } while(true);
-    current_object = nullptr;
     return class_state;
 }
 
