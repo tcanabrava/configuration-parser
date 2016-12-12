@@ -3,7 +3,7 @@
 
 Q_LOGGING_CATEGORY(stringDbg, "stringDbg")
 
-std::string camel_case_to_underscore(std::string s) {
+std::string camel_case_to_underscore(const std::string& s) {
     std::string ret;
     for(char x : s){
         if (x >= 'A' && x <= 'Z') {
@@ -16,11 +16,11 @@ std::string camel_case_to_underscore(std::string s) {
     return ret;
 }
 
-std::string underscore_to_camel_case(std::string s) {
+std::string underscore_to_camel_case(const std::string& s) {
     std::string ret;
-    for(int i = 0, end = s.size(); i < end; ++i) {
-        if (s[i] == '_' && i != end) {
-            s[i+1] ^= 32;
+    for(int i = 0, end = s.size()-1; i < end; ++i) {
+        if (s[i] == '_') {
+            ret += s[i+1] ^ 32;
             continue;
         }
         ret += s[i];
@@ -28,9 +28,10 @@ std::string underscore_to_camel_case(std::string s) {
     return ret;
 }
 
-std::string capitalize(std::string s, int pos) {
-    s[pos] ^= 32;
-    return s;
+std::string capitalize(const std::string& s, int pos) {
+    std::string ret = s;
+    ret[pos] ^= 32;
+    return ret;
 }
 
 void clear_empty(std::ifstream& f) {
