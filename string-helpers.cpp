@@ -1,4 +1,7 @@
 #include "string-helpers.h"
+#include <QLoggingCategory>
+
+Q_LOGGING_CATEGORY(stringDbg, "stringDbg")
 
 std::string camel_case_to_underscore(std::string s) {
     std::string ret;

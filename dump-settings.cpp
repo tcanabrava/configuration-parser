@@ -3,6 +3,9 @@
 #include "string-helpers.h"
 #include <cassert>
 
+Q_LOGGING_CATEGORY(dumpSource, "dumpSource")
+Q_LOGGING_CATEGORY(dumpHeader, "dumpHeader")
+
 void dump_class_settings(MetaClass *top, std::ofstream& file) {
     static std::string tabs;
 
@@ -197,7 +200,6 @@ void dump_class_header(MetaClass *top, std::ofstream& file) {
     file << "};" <<std::endl << std::endl;
 }
 
-//TODO: remember to fix the filenames.
 void dump_header(const std::string& filename) {
     std::ofstream header(filename);
     header << "#pragma once" << std::endl;

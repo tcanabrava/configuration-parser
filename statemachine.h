@@ -1,6 +1,9 @@
 #pragma once
 
 #include "meta-settings.h"
+#include <QLoggingCategory>
+
+Q_DECLARE_LOGGING_CATEGORY(callbackDebug)
 
 /* handles the beginning of the parsing, #includes, comments and classes. */
 callback_t initial_state(std::ifstream& f, int& error);
