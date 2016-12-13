@@ -88,12 +88,8 @@ std::vector<std::string> find_filenames(int argc, char *argv[]) {
 int main(int argc, char *argv[]) {
     std::vector<std::string> filenames = find_filenames(argc, argv);
     assert(filenames.size());
-
     for(const auto& file : filenames) {
-        std::cout << "Starting test of " << file << std::endl;
-        int retcode = test_file(file);
-        if (retcode)
-            return retcode;
+        assert(test_file(file) == 0);
     }
     return 0;
 }
