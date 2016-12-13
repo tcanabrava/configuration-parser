@@ -9,8 +9,11 @@ class Preferences : public QObject {
 Q_OBJECT
 
 public:
-	Preferences(QObject *parent = 0);
 	void sync();
 	void load();
 	static Preferences* self();
+
+private:
+	Preferences(QObject *parent = 0);
 };
+
