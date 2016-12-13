@@ -16,6 +16,7 @@ using namespace boost;
 using boost::filesystem::directory_entry;
 using boost::filesystem::directory_iterator;
 
+/* Check if the file represented by filename + one of the extensions exists on the filesystem */
 bool check_file_exists(std::string filename, const std::vector<std::string>& extensions) {
     for(const auto& extension : extensions) {
         if(!filesystem::exists(filename + extension)) {
@@ -26,6 +27,10 @@ bool check_file_exists(std::string filename, const std::vector<std::string>& ext
     return true;
 }
 
+/* Open the generated file and a existing, handmande file and verify them line-by-line,
+ * the files should be exactly the same, if they are not then the generation
+ * did something wrong and we need to fix that.
+ * */
 bool test_specific_file(const std::string& filename,
                         const std::pair<std::string, std::string>& extensions) {
     std::ifstream generated(filename + extensions.first);
@@ -42,6 +47,9 @@ bool test_specific_file(const std::string& filename,
     return true;
 }
 
+/* generates the header and sources files and call them
+ * test_specific_file for each of them.
+ * */
 int test_file(const std::string& filename) {
     std::ifstream file(filename + ".conf");
     int error;
@@ -67,6 +75,10 @@ int test_file(const std::string& filename) {
     return 0;
 }
 
+/* Uses all the files passed thru parameters or, if no file
+ * was avaliable via parameter, tries to find all the .conf
+ * files in this folder and returns them.
+ */
 std::vector<std::string> find_filenames(int argc, char *argv[]) {
     std::vector<std::string> filenames;
     if (argc == 1) {
@@ -85,6 +97,7 @@ std::vector<std::string> find_filenames(int argc, char *argv[]) {
     return filenames;
 }
 
+/* runs all configuration files on the test cases*/
 int main(int argc, char *argv[]) {
     std::vector<std::string> filenames = find_filenames(argc, argv);
     assert(filenames.size());
