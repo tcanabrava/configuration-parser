@@ -26,7 +26,8 @@ bool check_file_exists(std::string filename, const std::vector<std::string>& ext
     return true;
 }
 
-bool test_specific_file(const std::string& filename, const std::pair<std::string, std::string>& extensions) {
+bool test_specific_file(const std::string& filename,
+                        const std::pair<std::string, std::string>& extensions) {
     std::ifstream generated(filename + extensions.first);
     std::ifstream expected(filename + extensions.second);
     std::string gen, exp;
