@@ -3,6 +3,20 @@
 #include "meta-settings.h"
 #include <QLoggingCategory>
 
+/* This somewhat cryptic code defines a return type
+ * for a function that returns a function of the
+ * same parameters as defined in the typedef.
+ */
+template< typename... T > struct RecursiveHelper {
+    typedef std::function< RecursiveHelper(T...) > type;
+    RecursiveHelper( type f ) : func(f) {}
+    operator type () { return func; }
+    type func;
+};
+
+/* defines a return type for a function that has std::ifstream& and int& parameters. */
+typedef RecursiveHelper<std::ifstream&,int&>::type callback_t;
+
 Q_DECLARE_LOGGING_CATEGORY(callbackDebug)
 
 /* handles the beginning of the parsing, #includes, comments and classes. */
