@@ -41,6 +41,7 @@ callback_t property_state(std::ifstream& f, int& error);
 /* finishes the current property */
 callback_t end_property_state(std::ifstream& f, int& error);
 
+#if 0
 /* marks the current object (which can be a property or a class) as an array. */
 callback_t begin_array_state(std::ifstream& f, int& error);
 
@@ -49,6 +50,7 @@ callback_t array_state(std::ifstream& f, int& error);
 
 /* finishes the array. */
 callback_t end_array_state(std::ifstream& f, int& error);
+#endif
 
 /* starts a list of possible property values. */
 callback_t begin_property_set_state(std::ifstream& f, int& error);

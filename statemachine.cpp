@@ -119,6 +119,7 @@ callback_t begin_property_state(std::ifstream& f, int& error)
     std::string property_name;
     clear_empty(f);
 
+    boost::trim(global_string);
     current_property = std::make_shared<MetaProperty>();
     current_property->type = global_string;
     current_property->parent = current_class;
@@ -171,11 +172,9 @@ callback_t property_state(std::ifstream& f, int& error) {
         f.ignore();
     }
 
-    if (f.peek() == '[')
-        return begin_array_state;
-
     // easy, line finished, next property or class.
     if (f.peek() == '\n') {
+        current_class->properties.push_back(current_property);
         current_property = nullptr;
         std::cout << "finishing property" << std::endl;
         return class_state;
@@ -197,6 +196,7 @@ callback_t property_state(std::ifstream& f, int& error) {
     std::cout << std::endl;
 }
 
+#if 0
 callback_t begin_array_state(std::ifstream& f, int& error) {
     f.ignore();
     should_be_array = true;
@@ -227,6 +227,7 @@ callback_t end_array_state(std::ifstream& f, int& error) {
     }
     return nullptr;
 }
+#endif
 
 /* Start the default stuff -- classes,  includes and documentation. */
 callback_t initial_state(std::ifstream& f, int& error) {
@@ -237,7 +238,7 @@ callback_t initial_state(std::ifstream& f, int& error) {
     switch(c) {
         case '#' : return state_include;
         case '{' : return begin_class_state;
-        case '[' : return begin_array_state;
+        // case '[' : return begin_array_state;
         case '/' : return guess_documentation_state;
         case EOF : return nullptr;
         default :  return multi_purpose_string_state;
@@ -252,7 +253,7 @@ callback_t class_state(std::ifstream& f, int& error) {
     switch(c) {
         case '{' : return begin_class_state;
         case '}' : return end_class_state;
-        case '[' : return begin_array_state;
+      //  case '[' : return begin_array_state;
         case '/' : return guess_documentation_state;
     }
     return global_string.size() ? begin_property_state : multi_purpose_string_state;

@@ -144,7 +144,7 @@ void dump_class_source(MetaClass *top, std::ofstream& file) {
 }
 
 void dump_class_header(MetaClass *top, std::ofstream& file) {
-
+    qCDebug(dumpHeader) << "Dumping class header";
     for(auto&& child : top->subclasses) {
         dump_class_header(child.get(), file);
     }
@@ -153,6 +153,7 @@ void dump_class_header(MetaClass *top, std::ofstream& file) {
     file << "Q_OBJECT" << std::endl;
 
     // Q_PROPERTY declarations
+    qCDebug(dumpHeader) << "Class has:"  << top->properties.size() <<"properties.";
     for(auto&& p : top->properties) {
         file << "Q_PROPERTY(" << p->type << " " << camel_case_to_underscore(p->name) << " READ " << p->name << " WRITE set" << capitalize(p->name, 0) << " NOTIFY " << p->name << "Changed)" << std::endl;
     }
@@ -215,8 +216,9 @@ void dump_header(const std::string& filename) {
         header << "#include <" << include << ">" << std::endl;
     }
     header << std::endl;
-    if (top_level_class)
+    if (top_level_class) {
         dump_class_header(top_level_class.get(), header);
+    }
 }
 
 void dump_source(const std::string& filename) {

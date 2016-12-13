@@ -12,7 +12,7 @@ struct MetaClass;
 struct MetaProperty;
 
 struct MetaProperty {
-    typedef std::unique_ptr<MetaProperty> Ptr;
+    typedef std::shared_ptr<MetaProperty> Ptr;
     std::shared_ptr<MetaClass> parent;
     std::string name;
     std::string default_value;
