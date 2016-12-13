@@ -26,6 +26,21 @@ bool check_file_exists(std::string filename, const std::vector<std::string>& ext
     return true;
 }
 
+bool test_specific_file(const std::string& filename, const std::pair<std::string, std::string>& extensions) {
+    std::ifstream generated(filename + extensions.first);
+    std::ifstream expected(filename + extensions.second);
+    std::string gen, exp;
+    while(!generated.eof() || !expected.eof()) {
+        generated >> gen;
+        expected >> exp;
+        if (gen != exp) {
+            std::cout << "Error at" << exp;
+            return false;
+        }
+    }
+    return true;
+}
+
 int test_file(const std::string& filename) {
     std::ifstream file(filename + ".conf");
     int error;
@@ -37,31 +52,15 @@ int test_file(const std::string& filename) {
 
     if (check_file_exists(filename, {".h", "-header.expected"})) {
         dump_header(filename + ".h");
-        std::ifstream generated(filename + ".h");
-        std::ifstream expected(filename + "-header.expected");
-        std::string gen, exp;
-        while(!generated.eof() || !expected.eof()) {
-            generated >> gen;
-            expected >> exp;
-            if (gen != exp) {
-                std::cout << "Error at" << exp;
-                return -1;
-            }
+        if (!test_specific_file(filename, {".h", "-header.expected"})) {
+            return -1;
         }
     }
 
     if (check_file_exists(filename, {".cpp", "-source.expected"})) {
         dump_source(filename + ".cpp");
-        std::ifstream generated(filename + ".cpp");
-        std::ifstream expected(filename + "-source.expected");
-        std::string gen, exp;
-        while(!generated.eof() || !expected.eof()) {
-            generated >> gen;
-            expected >> exp;
-            if (gen != exp) {
-                std::cout << "Error at " << exp;
-                return -1;
-            }
+        if (!test_specific_file(filename, {".cpp", "-source.expected"})){
+            return -1;
         }
     }
     return 0;
