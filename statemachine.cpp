@@ -85,7 +85,8 @@ callback_t begin_class_state(std::ifstream& f, int& error) {
         top_level_class->parent = nullptr;
         current_class = top_level_class;
     } else {
-        qCDebug(parser) << "Creating a class with" << current_class->parent->name << "as parent";
+        assert(current_class);
+        qCDebug(parser) << "Creating a child class of" << current_class->name;
         auto old_parent = current_class;
         current_class->subclasses.push_back(std::make_shared<MetaClass>());
         current_class = current_class->subclasses.back();
@@ -106,6 +107,7 @@ callback_t end_class_state(std::ifstream& f, int& error) {
     f.ignore();
     std::cout << "finishing class " << current_class->name << std::endl;
     current_class = current_class->parent;
+
     if (current_class)
         return class_state;
     return nullptr;

@@ -215,7 +215,9 @@ void dump_header(const std::string& filename) {
     for(auto include : includes) {
         header << "#include <" << include << ">" << std::endl;
     }
-    header << std::endl;
+    if (includes.size()) {
+        header << std::endl;
+    }
     if (top_level_class) {
         dump_class_header(top_level_class.get(), header);
     }
