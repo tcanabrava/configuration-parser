@@ -43,3 +43,8 @@ std::string underscore_to_camel_case(const std::string& s);
  *
  * */
 std::string capitalize(const std::string& s, int pos = 0);
+
+/**
+ * Adds support for std::string into the debug enviroment.
+ */
+QDebug& operator<<(QDebug& debug, const std::string& s);

@@ -39,3 +39,8 @@ void clear_empty(std::ifstream& f) {
         f.ignore();
     }
 }
+
+QDebug & operator<<(QDebug& debug, const std::string& s)
+{
+    debug << s.c_str();
+}

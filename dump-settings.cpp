@@ -201,6 +201,8 @@ void dump_class_header(MetaClass *top, std::ofstream& file) {
 }
 
 void dump_header(const std::string& filename) {
+    qCDebug(dumpHeader) << "Starting to dump the source file into" << filename;
+
     std::ofstream header(filename);
     header << "#pragma once" << std::endl;
     header << std::endl;
