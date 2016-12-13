@@ -16,6 +16,9 @@ using namespace boost;
 using boost::filesystem::directory_entry;
 using boost::filesystem::directory_iterator;
 
+Q_DECLARE_LOGGING_CATEGORY(unittests)
+Q_LOGGING_CATEGORY(unittests, "unittests")
+
 /* Check if the file represented by filename + one of the extensions exists on the filesystem */
 bool check_file_exists(std::string filename, const std::vector<std::string>& extensions) {
     for(const auto& extension : extensions) {
@@ -100,6 +103,7 @@ std::vector<std::string> find_filenames(int argc, char *argv[]) {
 
 /* runs all configuration files on the test cases*/
 int main(int argc, char *argv[]) {
+    qCDebug(unittests) << "Starting unittests";
     std::vector<std::string> filenames = find_filenames(argc, argv);
     assert(filenames.size());
     for(const auto& file : filenames) {
