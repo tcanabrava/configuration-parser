@@ -1,0 +1,23 @@
+#pragma once
+
+#include <functional>
+#include <QObject>
+
+class InnerStruct : public QObject {
+Q_OBJECT
+
+public:
+	InnerStruct(QObject *parent = 0);
+};
+
+class Preferences : public QObject {
+Q_OBJECT
+Q_PROPERTY(QObject* _inner_struct MEMBER _InnerStruct CONSTANT);
+
+public:
+	Preferences(QObject *parent = 0);
+	InnerStruct *_InnerStruct;
+	void sync();
+	void load();
+	static Preferences* self();
+};
