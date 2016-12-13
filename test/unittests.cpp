@@ -58,20 +58,21 @@ int test_file(const std::string& filename) {
     std::ifstream file(filename + ".conf");
     int error;
 
+    MetaConfiguration conf;
     callback_t state = initial_state;
     while( state ) {
-        state = state(file, error);
+        state = state(conf, file, error);
     }
 
     if (check_file_exists(filename, {"-header.expected"})) {
-        dump_header(filename + ".h");
+        dump_header(conf, filename + ".h");
         if (!test_specific_file(filename, {".h", "-header.expected"})) {
             return -1;
         }
     }
 
     if (check_file_exists(filename, {"-source.expected"})) {
-        dump_source(filename + ".cpp");
+        dump_source(conf, filename + ".cpp");
         if (!test_specific_file(filename, {".cpp", "-source.expected"})){
             return -1;
         }

@@ -7,27 +7,27 @@
 
 Q_LOGGING_CATEGORY(parser, "parser")
 
-std::shared_ptr<MetaProperty> current_property;
-std::shared_ptr<MetaClass> current_class;
+namespace {
+    std::shared_ptr<MetaProperty> current_property;
+    std::shared_ptr<MetaClass> current_class;
 
-std::string global_string;
-std::string last_comment;
-bool should_be_array;
-std::string array_value;
-std::vector<std::string> includes;
-std::shared_ptr<MetaClass> top_level_class = nullptr;
+    std::string global_string;
+    std::string last_comment;
+    bool should_be_array;
+    std::string array_value;
+}
 
 /* reads #include directives. */
-callback_t state_include(std::ifstream& f, int& error) {
+callback_t state_include(MetaConfiguration& conf, std::ifstream& f, int& error) {
     char include_name[80];
     f.ignore(256, '<');
     f.getline(include_name, 80, '>'); // read untill >
-    includes.push_back(include_name);
+    conf.includes.push_back(include_name);
     std::cout << "include added: " << include_name << std::endl;
     return initial_state;
 }
 
-callback_t multi_purpose_string_state(std::ifstream& f, int& error) {
+callback_t multi_purpose_string_state(MetaConfiguration& conf, std::ifstream& f, int& error) {
     std::vector<char> delimiters = {'{', '[', '=', ' ', '\n' };
     while(std::find(delimiters.begin(), delimiters.end(), f.peek()) == delimiters.end()) {
         global_string += f.get();
@@ -39,7 +39,7 @@ callback_t multi_purpose_string_state(std::ifstream& f, int& error) {
         :  initial_state;
 }
 
-callback_t guess_documentation_state(std::ifstream& f, int& error) {
+callback_t guess_documentation_state(MetaConfiguration& conf, std::ifstream& f, int& error) {
         f.ignore();
         char c = f.peek();
         switch(c) {
@@ -49,7 +49,7 @@ callback_t guess_documentation_state(std::ifstream& f, int& error) {
         return nullptr;
 }
 
-callback_t multi_line_documentation_state(std::ifstream& f, int& error) {
+callback_t multi_line_documentation_state(MetaConfiguration& conf, std::ifstream& f, int& error) {
     std::string comment;
     char c;
     while(f.peek() != EOF) {
@@ -68,22 +68,21 @@ callback_t multi_line_documentation_state(std::ifstream& f, int& error) {
 
 }
 
-callback_t single_line_documentation_state(std::ifstream& f, int& error) {
+callback_t single_line_documentation_state(MetaConfiguration& conf, std::ifstream& f, int& error) {
     return nullptr;
 }
 
-callback_t begin_class_state(std::ifstream& f, int& error) {
+callback_t begin_class_state(MetaConfiguration& conf, std::ifstream& f, int& error) {
     qCDebug(parser) << "Starting class: " << global_string;
 
     f.ignore(); // eat the '{' character.
     clear_empty(f);
     boost::trim(global_string);
 
-    if (!top_level_class) {
+    if (!conf.top_level_class) {
         qCDebug(parser) << "Creating the top level class";
-        top_level_class = std::make_shared<MetaClass>();
-        top_level_class->parent = nullptr;
-        current_class = top_level_class;
+        conf.top_level_class = std::make_shared<MetaClass>();
+        current_class = conf.top_level_class;
     } else {
         assert(current_class);
         qCDebug(parser) << "Creating a child class of" << current_class->name;
@@ -103,7 +102,7 @@ callback_t begin_class_state(std::ifstream& f, int& error) {
     return class_state;
 }
 
-callback_t end_class_state(std::ifstream& f, int& error) {
+callback_t end_class_state(MetaConfiguration& conf, std::ifstream& f, int& error) {
     f.ignore();
     std::cout << "finishing class " << current_class->name << std::endl;
     current_class = current_class->parent;
@@ -113,7 +112,7 @@ callback_t end_class_state(std::ifstream& f, int& error) {
     return nullptr;
 }
 
-callback_t begin_property_state(std::ifstream& f, int& error)
+callback_t begin_property_state(MetaConfiguration& conf, std::ifstream& f, int& error)
 {
     // here we know that we have at least the type of the property,
     // but it can be three kinds of string.
@@ -138,7 +137,7 @@ callback_t begin_property_state(std::ifstream& f, int& error)
 }
 
 
-callback_t begin_property_set_state(std::ifstream& f, int& error) {
+callback_t begin_property_set_state(MetaConfiguration& conf, std::ifstream& f, int& error) {
     std::string name;
     std::string value;
     std::string tmp;
@@ -169,7 +168,7 @@ callback_t begin_property_set_state(std::ifstream& f, int& error) {
     return class_state;
 }
 
-callback_t property_state(std::ifstream& f, int& error) {
+callback_t property_state(MetaConfiguration& conf, std::ifstream& f, int& error) {
     while(f.peek() != '\n' && f.peek() != '=' && f.peek() != '[') {
         f.ignore();
     }
@@ -199,13 +198,13 @@ callback_t property_state(std::ifstream& f, int& error) {
 }
 
 #if 0
-callback_t begin_array_state(std::ifstream& f, int& error) {
+callback_t begin_array_state(MetaConfiguration& conf, std::ifstream& f, int& error) {
     f.ignore();
     should_be_array = true;
     return array_state;
 }
 
-callback_t array_state(std::ifstream& f, int& error) {
+callback_t array_state(MetaConfiguration& conf, std::ifstream& f, int& error) {
         clear_empty(f);
         char c = f.peek();
         if (c >= '0' && c <= '9') {
@@ -220,7 +219,7 @@ callback_t array_state(std::ifstream& f, int& error) {
         return nullptr;
 }
 
-callback_t end_array_state(std::ifstream& f, int& error) {
+callback_t end_array_state(MetaConfiguration& conf, std::ifstream& f, int& error) {
     f.ignore();
     if (current_property) {
         return property_state;
@@ -232,7 +231,7 @@ callback_t end_array_state(std::ifstream& f, int& error) {
 #endif
 
 /* Start the default stuff -- classes,  includes and documentation. */
-callback_t initial_state(std::ifstream& f, int& error) {
+callback_t initial_state(MetaConfiguration& conf, std::ifstream& f, int& error) {
     clear_empty(f);
 
     char c = f.peek();
@@ -249,7 +248,7 @@ callback_t initial_state(std::ifstream& f, int& error) {
 }
 
 /* starts the class stuff */
-callback_t class_state(std::ifstream& f, int& error) {
+callback_t class_state(MetaConfiguration& conf, std::ifstream& f, int& error) {
     clear_empty(f);
     char c = f.peek();
     switch(c) {

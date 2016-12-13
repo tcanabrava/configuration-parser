@@ -24,10 +24,12 @@ struct MetaClass {
     typedef std::shared_ptr<MetaClass> Ptr;
     std::vector<MetaProperty::Ptr> properties;
     std::vector<Ptr> subclasses;
-    std::shared_ptr<MetaClass> parent;
+    std::shared_ptr<MetaClass> parent = nullptr;
     std::string name;
     bool is_array;
 };
 
-extern std::vector<std::string> includes;
-extern std::shared_ptr<MetaClass> top_level_class;
+struct MetaConfiguration {
+    std::vector<std::string> includes;
+    std::shared_ptr<MetaClass> top_level_class = nullptr;
+};

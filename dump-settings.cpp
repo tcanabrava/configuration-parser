@@ -235,7 +235,7 @@ void dump_class_header(MetaClass *top, std::ofstream& file) {
     file << "};" <<std::endl << std::endl;
 }
 
-void dump_header(const std::string& filename) {
+void dump_header(const MetaConfiguration& conf, const std::string& filename) {
     qCDebug(dumpHeader) << "Starting to dump the source file into" << filename;
 
     std::ofstream header(filename);
@@ -246,18 +246,18 @@ void dump_header(const std::string& filename) {
 
     header << std::endl;
 
-    for(auto include : includes) {
+    for(auto include : conf.includes) {
         header << "#include <" << include << ">" << std::endl;
     }
-    if (includes.size()) {
+    if (conf.includes.size()) {
         header << std::endl;
     }
-    if (top_level_class) {
-        dump_class_header(top_level_class.get(), header);
+    if (conf.top_level_class) {
+        dump_class_header(conf.top_level_class.get(), header);
     }
 }
 
-void dump_source(const std::string& filename) {
+void dump_source(const MetaConfiguration& conf, const std::string& filename) {
     std::ofstream source(filename);
     source << "#include <test.h>" << std::endl;
     source << "#include <QSettings>" << std::endl;
