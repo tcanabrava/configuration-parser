@@ -34,3 +34,4 @@ private:
 	std::function<bool(int)> ageRule;
 	Preferences(QObject *parent = 0);
 };
+

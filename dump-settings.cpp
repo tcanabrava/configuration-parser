@@ -147,9 +147,6 @@ void dump_header_properties(std::ofstream& file,const  std::vector<std::shared_p
     if (!properties.size())
         return;
 
-    if (!has_private)
-        file << "private:" << std::endl;
-
     for(auto&& p : properties) {
         file << "\t" << p->type << " " << p->name << "() const;" << std::endl;
         file << "\tvoid set" << capitalize(p->name,0) << "Rule(std::function<bool(" << p->type << ")> rule);" << std::endl;
@@ -164,6 +161,7 @@ void dump_header_properties(std::ofstream& file,const  std::vector<std::shared_p
         file << "\tvoid " << p->name << "Changed(" << p->type <<" value);" << std::endl;
 
     file << std::endl << "private:" << std::endl;
+    has_private = true;
     for(auto&& p : properties) {
         file << "\t" << p->type << " _" << p->name <<";" << std::endl;
         file << "\tstd::function<bool(" << p->type << ")> " << p->name << "Rule;" << std::endl;
@@ -175,7 +173,7 @@ void dump_header_subclasses(std::ofstream& file, const std::vector<std::shared_p
         return;
 
     if (!has_private)
-        file << "private:" << std::endl;
+        file << std::endl << "private:" << std::endl;
 
     for(auto&& child : subclasses)
         file  << "\t" << child->name << " *_" << decapitalize(child->name, 0) << ";" << std::endl;
