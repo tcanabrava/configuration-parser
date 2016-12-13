@@ -148,6 +148,7 @@ void dump_class_header(MetaClass *top, std::ofstream& file) {
     for(auto&& child : top->subclasses) {
         dump_class_header(child.get(), file);
     }
+    bool has_private = false;
 
     file << "class " << top->name << " : public QObject {"  << std::endl;
     file << "Q_OBJECT" << std::endl;
@@ -158,15 +159,21 @@ void dump_class_header(MetaClass *top, std::ofstream& file) {
         file << "Q_PROPERTY(" << p->type << " " << camel_case_to_underscore(p->name) << " READ " << p->name << " WRITE set" << capitalize(p->name, 0) << " NOTIFY " << p->name << "Changed)" << std::endl;
     }
     for(auto&& child : top->subclasses) {
-        file <<"Q_PROPERTY(QObject* " << camel_case_to_underscore(child->name) << " MEMBER _" << child->name << " CONSTANT);" << std::endl;
+        file <<"Q_PROPERTY(QObject* " << camel_case_to_underscore(child->name) << " MEMBER _" << decapitalize(child->name, 0) << " CONSTANT);" << std::endl;
     }
 
     file << std::endl;
     file << "public:" << std::endl;
-    file <<"\t" << top->name <<"(QObject *parent = 0);" << std::endl;
+    if (top->parent) {
+        file <<"\t" << top->name <<"(QObject *parent = 0);" << std::endl;
+    } else  {
+        file << "\tvoid sync();" <<std::endl;
+        file << "\tvoid load();" <<std::endl;
+        file << "\tstatic " << top->name << "* self();" << std::endl;
+    }
 
     for(auto&& child : top->subclasses) {
-        file  << "\t" << child->name << " *" << decapitalize(child->name, 0) << ";" << std::endl;
+        file  << "\t" << child->name << " *" << decapitalize(child->name, 0) << "();" << std::endl;
     }
 
     if (top->properties.size()) {
@@ -186,17 +193,29 @@ void dump_class_header(MetaClass *top, std::ofstream& file) {
             file << "\tvoid " << p->name << "Changed(" << p->type <<" value);" << std::endl;
         }
 
-        file <<"private:" <<std::endl;
+        file << std::endl << "private:" << std::endl;
+        has_private = true;
         for(auto&& p : top->properties) {
             file << "\t" << p->type << " _" << p->name <<";" << std::endl;
             file << "\tstd::function<bool(" << p->type << ")> " << p->name << "Rule;" << std::endl;
         }
     }
+    if (top->subclasses.size()){
+        if (!has_private) {
+            file << std::endl << "private:" << std::endl;
+            has_private = true;
+        }
+        for(auto&& child : top->subclasses) {
+            file  << "\t" << child->name << " *_" << decapitalize(child->name, 0) << ";" << std::endl;
+        }
+    }
 
     if (!top->parent) {
-        file << "\tvoid sync();" <<std::endl;
-        file << "\tvoid load();" <<std::endl;
-        file << "\tstatic " << top->name << "* self();" << std::endl;
+        if (!has_private) {
+            file << std::endl << "private:" << std::endl;
+            has_private = true;
+        }
+        file <<"\t" << top->name <<"(QObject *parent = 0);" << std::endl;
     }
     file << "};" <<std::endl << std::endl;
 }
