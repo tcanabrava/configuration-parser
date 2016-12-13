@@ -20,7 +20,7 @@ using boost::filesystem::directory_iterator;
 bool check_file_exists(std::string filename, const std::vector<std::string>& extensions) {
     for(const auto& extension : extensions) {
         if(!filesystem::exists(filename + extension)) {
-            std::cerr << "Filename informed doesn't exists: " << filename;
+            std::cerr << "Filename informed doesn't exists: " << (filename + extension) << std::endl;
             return false;
         }
     }
@@ -87,12 +87,13 @@ std::vector<std::string> find_filenames(int argc, char *argv[]) {
             return algorithm::ends_with(s.path().generic_string(), ".conf");
         });
         for(const auto& file : files) {
-            filenames.push_back(file.path().generic_string());
+            // extract the .conf
+            std::string filename = file.path().generic_string();
+            int substrSize = filename.find('.');
+            filenames.push_back(filename.substr(0, substrSize));
         }
     } else for (int i = 1; i < argc; i++) {
-        if (algorithm::ends_with(argv[i], ".conf")) {
-            filenames.push_back(argv[i]);
-        }
+        filenames.push_back(argv[i]);
     }
     return filenames;
 }
