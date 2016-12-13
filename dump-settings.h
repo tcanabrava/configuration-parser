@@ -6,5 +6,8 @@
 Q_DECLARE_LOGGING_CATEGORY(dumpHeader)
 Q_DECLARE_LOGGING_CATEGORY(dumpSource)
 
-void dump_header(const std::string& s);
-void dump_source(const std::string& s);
+/* Generates the header file for the configuration */
+void dump_header(const std::string& filename);
+
+/* generates the source fole for the configuration */
+void dump_source(const std::string& filename);
