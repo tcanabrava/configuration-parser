@@ -143,12 +143,49 @@ void dump_class_source(MetaClass *top, std::ofstream& file) {
     }
 }
 
+void dump_header_properties(std::ofstream& file,const  std::vector<std::shared_ptr<MetaProperty>>& properties, bool& has_private){
+    if (!properties.size())
+        return;
+
+    if (!has_private)
+        file << "private:" << std::endl;
+
+    for(auto&& p : properties) {
+        file << "\t" << p->type << " " << p->name << "() const;" << std::endl;
+        file << "\tvoid set" << capitalize(p->name,0) << "Rule(std::function<bool(" << p->type << ")> rule);" << std::endl;
+    }
+
+    file << std::endl << "public slots:" << std::endl;
+    for(auto&& p : properties)
+        file << "\tvoid set" << capitalize(p->name,0) << "(" << p->type <<" value);" << std::endl;
+
+    file <<std::endl << "signals:" << std::endl;
+    for(auto&& p : properties)
+        file << "\tvoid " << p->name << "Changed(" << p->type <<" value);" << std::endl;
+
+    file << std::endl << "private:" << std::endl;
+    for(auto&& p : properties) {
+        file << "\t" << p->type << " _" << p->name <<";" << std::endl;
+        file << "\tstd::function<bool(" << p->type << ")> " << p->name << "Rule;" << std::endl;
+    }
+}
+
+void dump_header_subclasses(std::ofstream& file, const std::vector<std::shared_ptr<MetaClass>>& subclasses, bool& has_private) {
+    if (!subclasses.size())
+        return;
+
+    if (!has_private)
+        file << "private:" << std::endl;
+
+    for(auto&& child : subclasses)
+        file  << "\t" << child->name << " *_" << decapitalize(child->name, 0) << ";" << std::endl;
+}
+
 void dump_class_header(MetaClass *top, std::ofstream& file) {
     qCDebug(dumpHeader) << "Dumping class header";
     for(auto&& child : top->subclasses) {
         dump_class_header(child.get(), file);
     }
-    bool has_private = false;
 
     file << "class " << top->name << " : public QObject {"  << std::endl;
     file << "Q_OBJECT" << std::endl;
@@ -156,10 +193,20 @@ void dump_class_header(MetaClass *top, std::ofstream& file) {
     // Q_PROPERTY declarations
     qCDebug(dumpHeader) << "Class has:"  << top->properties.size() <<"properties.";
     for(auto&& p : top->properties) {
-        file << "Q_PROPERTY(" << p->type << " " << camel_case_to_underscore(p->name) << " READ " << p->name << " WRITE set" << capitalize(p->name, 0) << " NOTIFY " << p->name << "Changed)" << std::endl;
+        file << "Q_PROPERTY(" << p->type << " "
+             << camel_case_to_underscore(p->name)
+             << " READ " << p->name
+             << " WRITE set" << capitalize(p->name, 0)
+             << " NOTIFY " << p->name << "Changed)"
+             << std::endl;
     }
+
     for(auto&& child : top->subclasses) {
-        file <<"Q_PROPERTY(QObject* " << camel_case_to_underscore(child->name) << " MEMBER _" << decapitalize(child->name, 0) << " CONSTANT);" << std::endl;
+        file <<"Q_PROPERTY(QObject* "
+             << camel_case_to_underscore(child->name)
+             << " MEMBER _" << decapitalize(child->name, 0)
+             << " CONSTANT);"
+             << std::endl;
     }
 
     file << std::endl;
@@ -176,38 +223,9 @@ void dump_class_header(MetaClass *top, std::ofstream& file) {
         file  << "\t" << child->name << " *" << decapitalize(child->name, 0) << "();" << std::endl;
     }
 
-    if (top->properties.size()) {
-        for(auto&& p : top->properties) {
-            file << "\t" << p->type << " " << p->name << "() const;" << std::endl;
-            file << "\tvoid set" << capitalize(p->name,0) << "Rule(std::function<bool(" << p->type << ")> rule);" << std::endl;
-        }
-
-        file << std::endl << "public slots:" << std::endl;
-        for(auto&& p : top->properties) {
-            file << "\tvoid set" << capitalize(p->name,0) << "(" << p->type <<" value);" << std::endl;
-        }
-
-        file <<std::endl << "signals:" << std::endl;
-        for(auto&& p : top->properties) {
-            file << "\tvoid " << p->name << "Changed(" << p->type <<" value);" << std::endl;
-        }
-
-        file << std::endl << "private:" << std::endl;
-        has_private = true;
-        for(auto&& p : top->properties) {
-            file << "\t" << p->type << " _" << p->name <<";" << std::endl;
-            file << "\tstd::function<bool(" << p->type << ")> " << p->name << "Rule;" << std::endl;
-        }
-    }
-    if (top->subclasses.size()){
-        if (!has_private) {
-            file << std::endl << "private:" << std::endl;
-            has_private = true;
-        }
-        for(auto&& child : top->subclasses) {
-            file  << "\t" << child->name << " *_" << decapitalize(child->name, 0) << ";" << std::endl;
-        }
-    }
+    bool has_private = false;
+    dump_header_properties(file, top->properties, has_private);
+    dump_header_subclasses(file, top->subclasses, has_private);
 
     if (!top->parent) {
         if (!has_private) {
