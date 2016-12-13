@@ -182,13 +182,12 @@ void dump_class_header(MetaClass *top, std::ofstream& file) {
             file << "\tvoid set" << capitalize(p->name,0) << "Rule(std::function<bool(" << p->type << ")> rule);" << std::endl;
         }
 
-        file << std::endl;
-        file <<"public slots:" <<std::endl;
+        file << std::endl << "public slots:" << std::endl;
         for(auto&& p : top->properties) {
             file << "\tvoid set" << capitalize(p->name,0) << "(" << p->type <<" value);" << std::endl;
         }
 
-        file <<"signals:" <<std::endl;
+        file <<std::endl << "signals:" << std::endl;
         for(auto&& p : top->properties) {
             file << "\tvoid " << p->name << "Changed(" << p->type <<" value);" << std::endl;
         }
