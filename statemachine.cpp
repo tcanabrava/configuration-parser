@@ -23,7 +23,7 @@ callback_t state_include(MetaConfiguration& conf, std::ifstream& f, int& error) 
     f.ignore(256, '<');
     f.getline(include_name, 80, '>'); // read untill >
     conf.includes.push_back(include_name);
-    std::cout << "include added: " << include_name << std::endl;
+    qCDebug(parser) << "include added: " << include_name;
     return initial_state;
 }
 
@@ -33,7 +33,7 @@ callback_t multi_purpose_string_state(MetaConfiguration& conf, std::ifstream& f,
         global_string += f.get();
     }
 
-    std::cout << "stirng found: " << global_string << " next character: " << (char) f.peek() << std::endl;
+    qCDebug(parser) << "stirng found: " << global_string << " next character: " << (char) f.peek();
     return current_property ? nullptr // create a state for them.
         :  current_class ? class_state
         :  initial_state;
@@ -104,7 +104,7 @@ callback_t begin_class_state(MetaConfiguration& conf, std::ifstream& f, int& err
 
 callback_t end_class_state(MetaConfiguration& conf, std::ifstream& f, int& error) {
     f.ignore();
-    std::cout << "finishing class " << current_class->name << std::endl;
+    qCDebug(parser) << "finishing class " << current_class->name;
     current_class = current_class->parent;
 
     if (current_class)
@@ -132,7 +132,7 @@ callback_t begin_property_state(MetaConfiguration& conf, std::ifstream& f, int& 
         property_name += f.get();
     }
     current_property->name = property_name;
-    std::cout << "Starting property " << property_name << " ";
+    qCDebug(parser) << "Starting property " << property_name << " ";
     return property_state;
 }
 
@@ -157,13 +157,12 @@ callback_t begin_property_set_state(MetaConfiguration& conf, std::ifstream& f, i
             break;
 
         if (name == "value") {
-            std::cout << "found value for property  "  << value;
+            qCDebug(parser) << "found value for property  "  << value;
             current_property->default_value = value;
         } else {
-            std::cout << "fount setter " << name << " with value " << value;
+            qCDebug(parser) << "fount setter " << name << " with value " << value;
             current_property->setters.insert(std::make_pair(name,value));
         }
-        std::cout << std::endl;
     } while(true);
     return class_state;
 }
@@ -177,24 +176,23 @@ callback_t property_state(MetaConfiguration& conf, std::ifstream& f, int& error)
     if (f.peek() == '\n') {
         current_class->properties.push_back(current_property);
         current_property = nullptr;
-        std::cout << "finishing property" << std::endl;
+        qCDebug(parser) << "finishing property";
         return class_state;
     } else if (f.peek() == '='){
         f.ignore();
         clear_empty(f);
         if (f.peek() == '{') {
-            std::cout << "starting the set property set" << std::endl;
+            qCDebug(parser) << "starting the set property set";
             return begin_property_set_state;
         } else {
             char buffer[80];
             f.getline(buffer,80, '\n');
             current_property->default_value = buffer;
-            std::cout << "value = " << current_property->default_value << std::endl;
+            qCDebug(parser) << "value = " << current_property->default_value;
             current_property = nullptr;
             return class_state;
         }
     }
-    std::cout << std::endl;
 }
 
 #if 0
@@ -235,7 +233,7 @@ callback_t initial_state(MetaConfiguration& conf, std::ifstream& f, int& error) 
     clear_empty(f);
 
     char c = f.peek();
-    std::cout << "Peeking" << c << std::endl;
+    qCDebug(parser) << "Peeking" << c;
     switch(c) {
         case '#' : return state_include;
         case '{' : return begin_class_state;
