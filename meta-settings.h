@@ -6,6 +6,7 @@
 #include <vector>
 #include <memory>
 #include <map>
+#include <iostream>
 
 struct MetaClass;
 struct MetaProperty;

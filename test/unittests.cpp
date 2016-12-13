@@ -7,8 +7,8 @@
 #include <boost/range/adaptor/filtered.hpp>
 #include <boost/algorithm/string/predicate.hpp>
 
-#include "meta-settings.h"
 #include "string-helpers.h"
+#include "meta-settings.h"
 #include "statemachine.h"
 #include "dump-settings.h"
 
@@ -54,6 +54,7 @@ bool test_specific_file(const std::string& filename,
  * test_specific_file for each of them.
  * */
 int test_file(const std::string& filename) {
+    qCDebug(unittests) << "Starting the test for:" << filename;
     std::ifstream file(filename + ".conf");
     int error;
 
@@ -62,19 +63,20 @@ int test_file(const std::string& filename) {
         state = state(file, error);
     }
 
-    if (check_file_exists(filename, {".h", "-header.expected"})) {
+    if (check_file_exists(filename, {"-header.expected"})) {
         dump_header(filename + ".h");
         if (!test_specific_file(filename, {".h", "-header.expected"})) {
             return -1;
         }
     }
 
-    if (check_file_exists(filename, {".cpp", "-source.expected"})) {
+    if (check_file_exists(filename, {"-source.expected"})) {
         dump_source(filename + ".cpp");
         if (!test_specific_file(filename, {".cpp", "-source.expected"})){
             return -1;
         }
     }
+    qCDebug(unittests) << "Finished test for:" << filename << "without errors";
     return 0;
 }
 
@@ -92,7 +94,7 @@ std::vector<std::string> find_filenames(int argc, char *argv[]) {
         for(const auto& file : files) {
             // extract the .conf
             std::string filename = file.path().generic_string();
-            int substrSize = filename.find('.');
+            int substrSize = filename.find_last_of('.');
             filenames.push_back(filename.substr(0, substrSize));
         }
     } else for (int i = 1; i < argc; i++) {
@@ -106,6 +108,8 @@ int main(int argc, char *argv[]) {
     qCDebug(unittests) << "Starting unittests";
     std::vector<std::string> filenames = find_filenames(argc, argv);
     assert(filenames.size());
+    qCDebug(unittests) << "Testing the following files:" << filenames;
+
     for(const auto& file : filenames) {
         assert(test_file(file) == 0);
     }

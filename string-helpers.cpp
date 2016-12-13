@@ -40,7 +40,15 @@ void clear_empty(std::ifstream& f) {
     }
 }
 
-QDebug & operator<<(QDebug& debug, const std::string& s)
+QDebug & operator<<(QDebug& debug,const std::string& s)
 {
     debug << s.c_str();
+}
+
+QDebug & operator<<(QDebug& debug, const std::vector<std::string>& vector)
+{
+    for(const std::string& str : vector) {
+        debug << "\n" << str;
+    }
+    return debug;
 }

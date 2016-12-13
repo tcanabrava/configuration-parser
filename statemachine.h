@@ -3,6 +3,8 @@
 #include "meta-settings.h"
 #include <QLoggingCategory>
 
+Q_DECLARE_LOGGING_CATEGORY(parser)
+
 /* This somewhat cryptic code defines a return type
  * for a function that returns a function of the
  * same parameters as defined in the typedef.

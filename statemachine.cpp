@@ -5,6 +5,8 @@
 #include <boost/algorithm/string.hpp>
 #include "string-helpers.h"
 
+Q_LOGGING_CATEGORY(parser, "parser")
+
 std::shared_ptr<MetaProperty> current_property;
 std::shared_ptr<MetaClass> current_class;
 
@@ -71,17 +73,19 @@ callback_t single_line_documentation_state(std::ifstream& f, int& error) {
 }
 
 callback_t begin_class_state(std::ifstream& f, int& error) {
-    std::cout << "Starting class: " << global_string << std::endl;
+    qCDebug(parser) << "Starting class: " << global_string;
 
     f.ignore(); // eat the '{' character.
     clear_empty(f);
     boost::trim(global_string);
 
     if (!top_level_class) {
+        qCDebug(parser) << "Creating the top level class";
         top_level_class = std::make_shared<MetaClass>();
         top_level_class->parent = nullptr;
         current_class = top_level_class;
     } else {
+        qCDebug(parser) << "Creating a class with" << current_class->parent->name << "as parent";
         auto old_parent = current_class;
         current_class->subclasses.push_back(std::make_shared<MetaClass>());
         current_class = current_class->subclasses.back();
@@ -91,8 +95,8 @@ callback_t begin_class_state(std::ifstream& f, int& error) {
     current_class->is_array = should_be_array;
     should_be_array = false;
 
-    std::cout << "class found: " << current_class->name << ", is_array = " << current_class->is_array
-              <<", value = " << array_value << std::endl;
+    qCDebug(parser) << "class found: " << current_class->name << ", is_array = " << current_class->is_array
+              <<", value = " << array_value;
 
     global_string.clear();
     return class_state;

@@ -2,6 +2,9 @@
 
 #include <string>
 #include <fstream>
+#include <iostream>
+#include <vector>
+#include <sstream>
 
 #include <QLoggingCategory>
 
@@ -48,3 +51,19 @@ std::string capitalize(const std::string& s, int pos = 0);
  * Adds support for std::string into the debug enviroment.
  */
 QDebug& operator<<(QDebug& debug, const std::string& s);
+
+/**
+ * Adds support for std:vector into the debug enviroment.
+ */
+QDebug& operator<<(QDebug& debug, const std::vector<std::string>& vector);
+
+/*
+template<typename T>
+QDebug& operator<<(QDebug& debug, const std::vector<T>& vector) {
+    std::ostringstream stream;
+    std::copy(begin(vector), end(vector), std::ostream_iterator<T>(stream, ", "));
+    stream << vector.back();
+    debug << stream.str();
+}
+*/
+
