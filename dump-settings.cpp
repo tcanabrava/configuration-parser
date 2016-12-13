@@ -166,7 +166,7 @@ void dump_class_header(MetaClass *top, std::ofstream& file) {
     file <<"\t" << top->name <<"(QObject *parent = 0);" << std::endl;
 
     for(auto&& child : top->subclasses) {
-        file  << "\t" << child->name << " *_" << child->name << ";" << std::endl;
+        file  << "\t" << child->name << " *" << decapitalize(child->name, 0) << ";" << std::endl;
     }
 
     if (top->properties.size()) {

@@ -34,6 +34,13 @@ std::string capitalize(const std::string& s, int pos) {
     return ret;
 }
 
+std::string decapitalize(const std::string& s, int pos)
+{
+    std::string ret = s;
+    ret[pos] |= 32;
+    return ret;
+}
+
 void clear_empty(std::ifstream& f) {
     while(f.peek() == ' '  || f.peek() == '\n'){
         f.ignore();

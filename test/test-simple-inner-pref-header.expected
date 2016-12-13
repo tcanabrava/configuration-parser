@@ -16,7 +16,7 @@ Q_PROPERTY(QObject* _inner_struct MEMBER _InnerStruct CONSTANT);
 
 public:
 	Preferences(QObject *parent = 0);
-	InnerStruct *_InnerStruct;
+	InnerStruct *innerStruct();
 	void sync();
 	void load();
 	static Preferences* self();
