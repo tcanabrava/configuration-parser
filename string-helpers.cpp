@@ -5,9 +5,12 @@ Q_LOGGING_CATEGORY(stringDbg, "stringDbg")
 
 std::string camel_case_to_underscore(const std::string& s) {
     std::string ret;
-    for(char x : s){
+    for(int i = 0, end = s.size(); i < end; i++){
+        char x = s[i];
         if (x >= 'A' && x <= 'Z') {
-            ret += '_';
+            if (i != 0) {
+                ret += '_';
+            }
             ret += (char) (x | 32);
         } else {
             ret += x;

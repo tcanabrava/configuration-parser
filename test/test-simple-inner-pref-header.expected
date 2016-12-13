@@ -12,12 +12,16 @@ public:
 
 class Preferences : public QObject {
 Q_OBJECT
-Q_PROPERTY(QObject* _inner_struct MEMBER _InnerStruct CONSTANT);
+Q_PROPERTY(QObject* inner_struct MEMBER _innerStruct CONSTANT);
 
 public:
-	Preferences(QObject *parent = 0);
-	InnerStruct *innerStruct();
 	void sync();
 	void load();
 	static Preferences* self();
+	InnerStruct *innerStruct();
+
+private:
+	InnerStruct *_innerStruct;
+	Preferences(QObject *parent = 0);
 };
+
