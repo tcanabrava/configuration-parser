@@ -33,7 +33,7 @@ callback_t multi_purpose_string_state(MetaConfiguration& conf, std::ifstream& f,
         global_string += f.get();
     }
 
-    qCDebug(parser) << "stirng found: " << global_string << " next character: " << (char) f.peek();
+    qCDebug(parser) << "string found: " << global_string << " next character: " << (char) f.peek();
     return current_property ? nullptr // create a state for them.
         :  current_class ? class_state
         :  initial_state;
