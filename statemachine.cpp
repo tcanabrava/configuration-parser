@@ -161,11 +161,11 @@ callback_t begin_property_set_state(MetaConfiguration& conf, std::ifstream& f, i
             qCDebug(parser) << "found value for property  "  << value;
             current_property->default_value = value;
         } else {
-            qCDebug(parser) << "fount setter " << name << " with value " << value;
+            qCDebug(parser) << "found setter " << name << " with value " << value;
             current_property->setters.insert(std::make_pair(name,value));
         }
     } while(true);
-    return class_state;
+    return end_property_state;
 }
 
 callback_t property_state(MetaConfiguration& conf, std::ifstream& f, int& error) {
