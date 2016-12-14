@@ -14,7 +14,7 @@ struct MetaProperty;
 /* struct that represents a variable in the configuration file. */
 struct MetaProperty {
     typedef std::shared_ptr<MetaProperty> Ptr;
-    std::shared_ptr<MetaClass> parent;
+    std::shared_ptr<MetaClass> parent = nullptr;
     std::string name;
     std::string default_value;
     std::string type;
