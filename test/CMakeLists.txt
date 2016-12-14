@@ -17,7 +17,6 @@ add_custom_target(check COMMAND ${CMAKE_CTEST_COMMAND}
         unittests
 )
 
-file(GLOB TESTS *.conf)
-file(GLOB RESULTS *.expected)
+FILE(GLOB TESTS *.conf*)
 
-add_custom_target(pre-check  COMMAND cp ${TESTS} ${RESULTS} ${CMAKE_BINARY_DIR}/test)
+add_custom_target(pre-check  COMMAND cp ${TESTS} ${CMAKE_BINARY_DIR}/test)

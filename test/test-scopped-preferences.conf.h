@@ -46,8 +46,6 @@ public:
 private:
 	InnerPrefs1 *_innerPrefs1;
 	InnerPrefs2 *_innerPrefs2;
-
-private:
 	Preferences(QObject *parent = 0);
 };
 

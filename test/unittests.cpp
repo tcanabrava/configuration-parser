@@ -64,16 +64,16 @@ int test_file(const std::string& filename) {
         state = state(conf, file, error);
     }
 
-    if (check_file_exists(filename, {"-header.expected"})) {
+    if (check_file_exists(filename, {".conf.h"})) {
         dump_header(conf, filename + ".h");
-        if (!test_specific_file(filename, {".h", "-header.expected"})) {
+        if (!test_specific_file(filename, {".h", ".conf.h"})) {
             return -1;
         }
     }
 
-    if (check_file_exists(filename, {"-source.expected"})) {
+    if (check_file_exists(filename, {".conf.cpp"})) {
         dump_source(conf, filename + ".cpp");
-        if (!test_specific_file(filename, {".cpp", "-source.expected"})){
+        if (!test_specific_file(filename, {".cpp", ".conf.cpp"})){
             return -1;
         }
     }
@@ -99,7 +99,10 @@ std::vector<std::string> find_filenames(int argc, char *argv[]) {
             filenames.push_back(filename.substr(0, substrSize));
         }
     } else for (int i = 1; i < argc; i++) {
-        filenames.push_back(argv[i]);
+        if (algorithm::ends_with(argv[i], ".conf")) {
+            std::string file(argv[i]);
+            filenames.push_back(file.substr(0, file.find_last_of('.')));
+        }
     }
     return filenames;
 }

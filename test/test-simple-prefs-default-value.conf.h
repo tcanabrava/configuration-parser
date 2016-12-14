@@ -3,7 +3,7 @@
 #include <functional>
 #include <QObject>
 
-#include <iostream>
+#include <string>
 
 class Preferences : public QObject {
 Q_OBJECT
