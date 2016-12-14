@@ -131,6 +131,7 @@ callback_t begin_property_state(MetaConfiguration& conf, std::ifstream& f, int& 
     while(std::find(delimiters.begin(), delimiters.end(), f.peek()) == delimiters.end()) {
         property_name += f.get();
     }
+    boost::trim(property_name);
     current_property->name = property_name;
     qCDebug(parser) << "Starting property " << property_name << " ";
     return property_state;
@@ -174,10 +175,7 @@ callback_t property_state(MetaConfiguration& conf, std::ifstream& f, int& error)
 
     // easy, line finished, next property or class.
     if (f.peek() == '\n') {
-        current_class->properties.push_back(current_property);
-        current_property = nullptr;
-        qCDebug(parser) << "finishing property";
-        return class_state;
+        return end_property_state;
     } else if (f.peek() == '='){
         f.ignore();
         clear_empty(f);
@@ -188,11 +186,17 @@ callback_t property_state(MetaConfiguration& conf, std::ifstream& f, int& error)
             char buffer[80];
             f.getline(buffer,80, '\n');
             current_property->default_value = buffer;
-            qCDebug(parser) << "value = " << current_property->default_value;
-            current_property = nullptr;
-            return class_state;
+            return end_property_state;
         }
     }
+}
+
+callback_t end_property_state(MetaConfiguration& conf, std::ifstream& f, int& error)
+{
+    current_class->properties.push_back(current_property);
+    qCDebug(parser) << "finishing property" << current_property->name;
+    current_property = nullptr;
+    return class_state;
 }
 
 #if 0
