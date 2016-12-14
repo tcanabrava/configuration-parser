@@ -11,6 +11,7 @@
 struct MetaClass;
 struct MetaProperty;
 
+/* struct that represents a variable in the configuration file. */
 struct MetaProperty {
     typedef std::shared_ptr<MetaProperty> Ptr;
     std::shared_ptr<MetaClass> parent;
@@ -20,6 +21,7 @@ struct MetaProperty {
     std::map<std::string, std::string> setters;
 };
 
+/* struct that represents a {} entity in the configuration file. */
 struct MetaClass {
     typedef std::shared_ptr<MetaClass> Ptr;
     std::vector<MetaProperty::Ptr> properties;
@@ -29,6 +31,7 @@ struct MetaClass {
     bool is_array;
 };
 
+/* struct that represents the whole configuration file. */
 struct MetaConfiguration {
     std::vector<std::string> includes;
     std::shared_ptr<MetaClass> top_level_class = nullptr;
