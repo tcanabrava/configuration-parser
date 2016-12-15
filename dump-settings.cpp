@@ -6,7 +6,7 @@
 Q_LOGGING_CATEGORY(dumpSource, "dumpSource")
 Q_LOGGING_CATEGORY(dumpHeader, "dumpHeader")
 
-void dump_class_settings(MetaClass *top, std::ofstream& file) {
+void dump_source_class_settings_set_values(MetaClass *top, std::ofstream& file) {
     static std::string tabs;
 
     if (top->parent) {
@@ -15,7 +15,7 @@ void dump_class_settings(MetaClass *top, std::ofstream& file) {
 
     tabs += '\t';
     for(auto&& s : top->subclasses) {
-        dump_class_settings(s.get(), file);
+        dump_source_class_settings_set_values(s.get(), file);
     }
     tabs.erase(0,1);
 
@@ -39,7 +39,7 @@ void dump_class_settings(MetaClass *top, std::ofstream& file) {
     }
 }
 
-void load_class_settings(MetaClass *top, std::ofstream& file) {
+void dump_source_class_settings_get_values(MetaClass *top, std::ofstream& file) {
     static std::string tabs;
 
     if (top->parent) {
@@ -48,7 +48,7 @@ void load_class_settings(MetaClass *top, std::ofstream& file) {
 
     tabs += '\t';
     for(auto&& s : top->subclasses) {
-        load_class_settings(s.get(), file);
+        dump_source_class_settings_get_values(s.get(), file);
     }
     tabs.erase(0,1);
 
@@ -72,9 +72,9 @@ void load_class_settings(MetaClass *top, std::ofstream& file) {
     }
 }
 
-void dump_class_source(MetaClass *top, std::ofstream& file) {
+void dump_source_class(MetaClass *top, std::ofstream& file) {
     for(auto&& child : top->subclasses) {
-        dump_class_source(child.get(), file);
+        dump_source_class(child.get(), file);
     }
 
     //Constructors.
@@ -126,14 +126,16 @@ void dump_class_source(MetaClass *top, std::ofstream& file) {
         file << '{' << std::endl;
         file << "\tQSettings s;" << std::endl;
 
-        dump_class_settings(top, file);
+        dump_source_class_settings_set_values(top, file);
+
         file << '}' << std::endl;
 
         file << "void " << top->name << "::load()" << std::endl;
         file << '{' << std::endl;
         file << "\tQSettings s;" << std::endl;
 
-        load_class_settings(top, file);
+        dump_source_class_settings_get_values(top, file);
+
         file << '}' << std::endl;
         file << top->name << "* " << top->name <<"::self()" << std::endl;
         file << "{" << std::endl;
@@ -181,10 +183,10 @@ void dump_header_subclasses(std::ofstream& file, const std::vector<std::shared_p
         file  << "\t" << child->name << " *_" << decapitalize(child->name, 0) << ";" << std::endl;
 }
 
-void dump_class_header(MetaClass *top, std::ofstream& file) {
+void dump_header_class(MetaClass *top, std::ofstream& file) {
     qCDebug(dumpHeader) << "Dumping class header";
     for(auto&& child : top->subclasses) {
-        dump_class_header(child.get(), file);
+        dump_header_class(child.get(), file);
     }
 
     file << "class " << top->name << " : public QObject {"  << std::endl;
@@ -255,7 +257,7 @@ void dump_header(const MetaConfiguration& conf, const std::string& filename) {
         header << std::endl;
     }
     if (conf.top_level_class) {
-        dump_class_header(conf.top_level_class.get(), header);
+        dump_header_class(conf.top_level_class.get(), header);
     }
 }
 
