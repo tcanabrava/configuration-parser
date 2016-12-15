@@ -23,7 +23,7 @@ Q_LOGGING_CATEGORY(unittests, "unittests")
 bool check_file_exists(std::string filename, const std::vector<std::string>& extensions) {
     for(const auto& extension : extensions) {
         if(!filesystem::exists(filename + extension)) {
-            std::cerr << "Filename informed doesn't exists: " << (filename + extension) << std::endl;
+            std::cout << "Filename informed doesn't exist: " << (filename + extension) << std::endl;
             return false;
         }
     }
