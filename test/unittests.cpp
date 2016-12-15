@@ -43,7 +43,7 @@ bool test_specific_file(const std::string& filename,
         generated >> gen;
         expected >> exp;
         if (gen != exp) {
-            std::cout << "Error at" << exp;
+            std::cout << "Error at " << exp;
             return false;
         }
     }
@@ -77,7 +77,7 @@ int test_file(const std::string& filename) {
             return -1;
         }
     }
-    qCDebug(unittests) << "Finished test for:" << filename << "without errors";
+    qCDebug(unittests) << "Finished test for: " << filename << " without errors";
     return 0;
 }
 
