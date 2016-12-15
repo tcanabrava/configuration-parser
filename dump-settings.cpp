@@ -72,6 +72,21 @@ void dump_source_class_settings_get_values(MetaClass *top, std::ofstream& file) 
     }
 }
 
+bool class_or_subclass_have_properties(MetaClass *top) {
+    if (!top)
+        return false;
+    if (top->properties.size() != 0) {
+        return true;
+    }
+
+    for(auto child : top->subclasses) {
+        if (class_or_subclass_have_properties(child.get())) {
+            return true;
+        }
+    }
+    return false;
+}
+
 void dump_source_class(MetaClass *top, std::ofstream& file) {
     for(auto&& child : top->subclasses) {
         dump_source_class(child.get(), file);
@@ -89,6 +104,7 @@ void dump_source_class(MetaClass *top, std::ofstream& file) {
     }
     file << '{' << std::endl;
     file << '}' << std::endl;
+    file << std::endl;
 
     //get - methods.
     for(auto&& p : top->properties) {
@@ -98,6 +114,8 @@ void dump_source_class(MetaClass *top, std::ofstream& file) {
         file << '}' << std::endl;
         file << std::endl;
     }
+    if (top->properties.size())
+        file << std::endl;
 
     //set-methods
     for(auto&& p : top->properties) {
@@ -110,6 +128,8 @@ void dump_source_class(MetaClass *top, std::ofstream& file) {
         file << '}' << std::endl;
         file << std::endl;
     }
+    if (top->properties.size())
+        file << std::endl;
 
     //rule-methods {
     for(auto&& p : top->properties) {
@@ -119,24 +139,28 @@ void dump_source_class(MetaClass *top, std::ofstream& file) {
         file << '}' << std::endl;
         file << std::endl;
     }
+    if (top->properties.size())
+        file << std::endl;
 
     // main preferences class
     if (!top->parent) {
+
         file << "void " << top->name << "::sync()" << std::endl;
         file << '{' << std::endl;
-        file << "\tQSettings s;" << std::endl;
-
-        dump_source_class_settings_set_values(top, file);
-
+        if (class_or_subclass_have_properties(top)) {
+            file << "\tQSettings s;" << std::endl;
+            dump_source_class_settings_set_values(top, file);
+        }
         file << '}' << std::endl;
-
+        file << std::endl;
         file << "void " << top->name << "::load()" << std::endl;
         file << '{' << std::endl;
-        file << "\tQSettings s;" << std::endl;
-
-        dump_source_class_settings_get_values(top, file);
-
+        if (class_or_subclass_have_properties(top)) {
+            file << "\tQSettings s;" << std::endl;
+            dump_source_class_settings_get_values(top, file);
+        }
         file << '}' << std::endl;
+        file << std::endl;
         file << top->name << "* " << top->name <<"::self()" << std::endl;
         file << "{" << std::endl;
         file << "\tstatic " << top->name << " s;" << std::endl;
@@ -263,8 +287,11 @@ void dump_header(const MetaConfiguration& conf, const std::string& filename) {
 
 void dump_source(const MetaConfiguration& conf, const std::string& filename) {
     std::ofstream source(filename);
-    source << "#include <test.h>" << std::endl;
+    source << "#include <" << filename.substr(0, filename.find_last_of(".")) << ".h>" << std::endl;
     source << "#include <QSettings>" << std::endl;
     source << std::endl;
-    // something based on dump_header here.
+
+    if (conf.top_level_class) {
+        dump_source_class(conf.top_level_class.get(), source);
+    }
 }
