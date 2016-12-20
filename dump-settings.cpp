@@ -21,17 +21,19 @@ void dump_source_class_settings_set_values(MetaClass *top, std::ofstream& file) 
 
     tabs += '\t';
     for(auto&& p : top->properties) {
-        std::string callchain = '_' + top->name;
+        std::string callchain;
         file << tabs << "s.setValue(\"" << camel_case_to_underscore(p->name) << "\",";
         auto tmp = top->parent;
         if (tmp && tmp->parent) {
             while(tmp->parent ) {
-                std::string s = '_' + tmp->name + "->";
+                std::string s = decapitalize(tmp->name,0) + "()->";
                 callchain.insert(0,s);
                 tmp = tmp->parent;
             }
         }
-        file << callchain << "->" << p->name << "());" << std::endl;
+        if (callchain.size())
+            file << callchain << "->";
+        file << p->name << "());" << std::endl;
     }
     tabs.erase(0,1);
     if (top->parent) {
@@ -54,7 +56,7 @@ void dump_source_class_settings_get_values(MetaClass *top, std::ofstream& file) 
 
     tabs += '\t';
     for(auto&& p : top->properties) {
-        std::string callchain = '_' + top->name;
+        std::string callchain;
         auto tmp = top->parent;
         if (tmp && tmp->parent) {
             while(tmp->parent ) {
@@ -63,7 +65,10 @@ void dump_source_class_settings_get_values(MetaClass *top, std::ofstream& file) 
                 tmp = tmp->parent;
             }
         }
-        file << tabs << callchain << "->set" << capitalize(p->name,0)
+        file << tabs;
+        if (callchain.size())
+            file << callchain << "->";
+        file << "set" << capitalize(p->name,0)
               << "(s.value(\"" << camel_case_to_underscore(p->name) << "\").value<" << p->type << ">());" << std::endl;
     }
     tabs.erase(0,1);
@@ -121,8 +126,6 @@ void dump_source_class(MetaClass *top, std::ofstream& file) {
         file << '}' << std::endl;
         file << std::endl;
     }
-    if (top->properties.size())
-        file << std::endl;
 
     //set-methods
     for(auto&& p : top->properties) {
@@ -135,8 +138,6 @@ void dump_source_class(MetaClass *top, std::ofstream& file) {
         file << '}' << std::endl;
         file << std::endl;
     }
-    if (top->properties.size())
-        file << std::endl;
 
     //rule-methods {
     for(auto&& p : top->properties) {
@@ -146,8 +147,6 @@ void dump_source_class(MetaClass *top, std::ofstream& file) {
         file << '}' << std::endl;
         file << std::endl;
     }
-    if (top->properties.size())
-        file << std::endl;
 
     // main preferences class
     if (!top->parent) {
