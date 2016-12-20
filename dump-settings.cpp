@@ -95,7 +95,7 @@ void dump_source_class(MetaClass *top, std::ofstream& file) {
     //Constructors.
     file << top->name << "::" << top->name << "(QObject *parent) : QObject(parent)";
     for(auto&& c : top->subclasses) {
-        file << ',' << std::endl << "\t_" << c->name << "(new " << c->name << "(this))";
+        file << ',' << std::endl << "\t_" << decapitalize(c->name,0) << "(new " << c->name << "(this))";
     }
     for(auto&& p : top->properties) {
         if (p->default_value.size()) {
@@ -111,6 +111,13 @@ void dump_source_class(MetaClass *top, std::ofstream& file) {
         file << p->type << ' ' << top->name << "::" << p->name << "() const" << std::endl;
         file << '{' << std::endl;
         file << "\treturn _" << p->name << ';' << std::endl;
+        file << '}' << std::endl;
+        file << std::endl;
+    }
+    for(auto&& c : top->subclasses) {
+        file << c->name << "* " << top->name << "::" << decapitalize(c->name) << "() const" << std::endl;
+        file << '{' << std::endl;
+        file << "\treturn _" << decapitalize(c->name) << ';' << std::endl;
         file << '}' << std::endl;
         file << std::endl;
     }
@@ -246,7 +253,7 @@ void dump_header_class(MetaClass *top, std::ofstream& file) {
     }
 
     for(auto&& child : top->subclasses) {
-        file  << "\t" << child->name << " *" << decapitalize(child->name, 0) << "();" << std::endl;
+        file  << "\t" << child->name << " *" << decapitalize(child->name, 0) << "() const;" << std::endl;
     }
 
     bool has_private = false;
