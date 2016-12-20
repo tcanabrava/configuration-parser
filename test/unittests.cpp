@@ -67,6 +67,7 @@ int test_file(const std::string& filename) {
     if (check_file_exists(filename, {".conf.h"})) {
         dump_header(conf, filename + ".h");
         if (!test_specific_file(filename, {".h", ".conf.h"})) {
+            qCDebug(unittests) << "Error on" << filename << ".h";
             return -1;
         }
     }
@@ -74,6 +75,7 @@ int test_file(const std::string& filename) {
     if (check_file_exists(filename, {".conf.cpp"})) {
         dump_source(conf, filename + ".cpp");
         if (!test_specific_file(filename, {".cpp", ".conf.cpp"})){
+            qCDebug(unittests) << "Error on" << filename << ".cpp";
             return -1;
         }
     }

@@ -18,7 +18,7 @@ public:
 	void sync();
 	void load();
 	static Preferences* self();
-	InnerStruct *innerStruct();
+	InnerStruct *innerStruct() const;
 
 private:
 	InnerStruct *_innerStruct;

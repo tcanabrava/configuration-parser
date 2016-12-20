@@ -18,7 +18,7 @@ Q_PROPERTY(QObject* inner_inner_prefs1 MEMBER _innerInnerPrefs1 CONSTANT);
 
 public:
 	InnerPrefs1(QObject *parent = 0);
-	InnerInnerPrefs1 *innerInnerPrefs1();
+	InnerInnerPrefs1 *innerInnerPrefs1() const;
 
 private:
 	InnerInnerPrefs1 *_innerInnerPrefs1;
@@ -40,8 +40,8 @@ public:
 	void sync();
 	void load();
 	static Preferences* self();
-	InnerPrefs1 *innerPrefs1();
-	InnerPrefs2 *innerPrefs2();
+	InnerPrefs1 *innerPrefs1() const;
+	InnerPrefs2 *innerPrefs2() const;
 
 private:
 	InnerPrefs1 *_innerPrefs1;
