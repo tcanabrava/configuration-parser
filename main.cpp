@@ -27,11 +27,11 @@ int main(int argc, char *argv[]) {
     }
 
     // Start the state machine
-    MetaConfiguration conf;
-    callback_t state = initial_state;
-    while( state ) {
-        state = state(conf, file, error);
-    }
+    //MetaConfiguration conf;
+    //callback_t state = initial_state;
+    //while( state ) {
+    //    state = state(conf, file, error);
+    //}
 
     dump_header(conf, filename + ".h");
     dump_source(conf, filename + ".cpp");

@@ -78,3 +78,5 @@ callback_t multi_line_documentation_state(MetaConfiguration& conf, std::ifstream
 callback_t multi_purpose_string_state(MetaConfiguration& conf, std::ifstream& f, int& error);
 
 callback_t guess_documentation_state(MetaConfiguration& conf, std::ifstream& f, int& error);
+
+bool parse_configuration (std::ifstream& f);
