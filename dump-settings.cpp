@@ -31,6 +31,9 @@ void dump_source_class_settings_set_values(MetaClass *top, std::ofstream& file) 
                 tmp = tmp->parent;
             }
         }
+        if (p->is_enum) {
+            file << "(int) ";
+        }
         if (callchain.size())
             file << callchain << "->";
         file << p->name << "());" << std::endl;
@@ -66,10 +69,15 @@ void dump_source_class_settings_get_values(MetaClass *top, std::ofstream& file) 
             }
         }
         file << tabs;
+        std::string type = p->is_enum ? "int" : p->type;
         if (callchain.size())
             file << callchain << "->";
-        file << "set" << capitalize(p->name,0)
-              << "(s.value(\"" << camel_case_to_underscore(p->name) << "\").value<" << p->type << ">());" << std::endl;
+        file << "set" << capitalize(p->name,0) << "(";
+
+        if (p->is_enum)
+            file << "(" << p->type << ")";
+
+        file << "s.value(\"" << camel_case_to_underscore(p->name) << "\").value<" << p->type << ">());" << std::endl;
     }
     tabs.erase(0,1);
     if (top->parent) {
