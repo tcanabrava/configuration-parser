@@ -23,7 +23,7 @@ void dump_source_class_settings_set_values(MetaClass *top, std::ofstream& file) 
     for(auto&& p : top->properties) {
         std::string callchain;
         file << tabs << "s.setValue(\"" << camel_case_to_underscore(p->name) << "\",";
-        auto tmp = top->parent;
+        auto tmp = p->parent;
         if (tmp && tmp->parent) {
             while(tmp->parent ) {
                 std::string s = decapitalize(tmp->name,0) + "()->";
@@ -35,7 +35,7 @@ void dump_source_class_settings_set_values(MetaClass *top, std::ofstream& file) 
             file << "(int) ";
         }
         if (callchain.size())
-            file << callchain << "->";
+            file << callchain;
         file << p->name << "());" << std::endl;
     }
     tabs.erase(0,1);
@@ -60,18 +60,16 @@ void dump_source_class_settings_get_values(MetaClass *top, std::ofstream& file) 
     tabs += '\t';
     for(auto&& p : top->properties) {
         std::string callchain;
-        auto tmp = top->parent;
+        auto tmp = p->parent;
         if (tmp && tmp->parent) {
             while(tmp->parent ) {
-                std::string s = '_' + tmp->name + "->";
+                std::string s =  decapitalize(tmp->name, 0) + "()->";
                 callchain.insert(0,s);
                 tmp = tmp->parent;
             }
         }
-        file << tabs;
+        file << tabs << callchain;
         std::string type = p->is_enum ? "int" : p->type;
-        if (callchain.size())
-            file << callchain << "->";
         file << "set" << capitalize(p->name,0) << "(";
 
         if (p->is_enum)
