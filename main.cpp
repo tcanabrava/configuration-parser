@@ -18,7 +18,7 @@ int main(int argc, char *argv[]) {
     }
 
     std::string filename(argv[1]);
-    std::ifstream file(filename + ".conf");
+    std::ifstream file(filename);
 
     if ( (file.rdstate() & std::ifstream::failbit) != 0) {
         std::cerr << "could not open file." << std::endl;
@@ -26,6 +26,9 @@ int main(int argc, char *argv[]) {
 
     MetaConfiguration conf = parse_configuration(file);
 
-    dump_header(conf, filename + ".h");
-    dump_source(conf, filename + ".cpp");
+    int substrSize = filename.find_last_of('.');
+    std::string name_without_ext = filename.substr(0, substrSize);
+
+    dump_header(conf, name_without_ext + ".h");
+    dump_source(conf, name_without_ext + ".cpp");
 }
