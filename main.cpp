@@ -17,8 +17,6 @@ int main(int argc, char *argv[]) {
         return 0;
     }
 
-    int error;
-
     std::string filename(argv[1]);
     std::ifstream file(filename + ".conf");
 
@@ -26,12 +24,7 @@ int main(int argc, char *argv[]) {
         std::cerr << "could not open file." << std::endl;
     }
 
-    // Start the state machine
-    //MetaConfiguration conf;
-    //callback_t state = initial_state;
-    //while( state ) {
-    //    state = state(conf, file, error);
-    //}
+    MetaConfiguration conf = parse_configuration(file);
 
     dump_header(conf, filename + ".h");
     dump_source(conf, filename + ".cpp");

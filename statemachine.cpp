@@ -262,17 +262,13 @@ callback_t class_state(MetaConfiguration& conf, std::ifstream& f, int& error) {
     return global_string.size() ? begin_property_state : multi_purpose_string_state;
 }
 
-bool parse_configuration (std::ifstream& f)
+MetaConfiguration parse_configuration (std::ifstream& f)
 {
     int error;
-    
-    MetaConfiguration& conf;
-    
+    MetaConfiguration conf;
     callback_t state = initial_state;
-    
-    while( state ) 
-    {
+    while( state ) {
         state = state(conf, f, error);
-    } 
-    return error == 0;
+    }
+    return conf;
 }

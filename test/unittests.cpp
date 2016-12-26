@@ -56,13 +56,8 @@ bool test_specific_file(const std::string& filename,
 int test_file(const std::string& filename) {
     qCDebug(unittests) << "Starting the test for:" << filename;
     std::ifstream file(filename + ".conf");
-    int error;
 
-    MetaConfiguration conf;
-    callback_t state = initial_state;
-    while( state ) {
-        state = state(conf, file, error);
-    }
+    MetaConfiguration conf = parse_configuration(file);
 
     if (check_file_exists(filename, {".conf.h"})) {
         dump_header(conf, filename + ".h");

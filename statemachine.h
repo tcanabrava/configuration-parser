@@ -79,4 +79,5 @@ callback_t multi_purpose_string_state(MetaConfiguration& conf, std::ifstream& f,
 
 callback_t guess_documentation_state(MetaConfiguration& conf, std::ifstream& f, int& error);
 
-bool parse_configuration (std::ifstream& f);
+/* starts to parse a configuration, and returns a MetaConfiguration object - basically an AST of the doc. */
+MetaConfiguration parse_configuration (std::ifstream& f);
