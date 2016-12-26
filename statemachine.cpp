@@ -13,7 +13,6 @@ namespace {
 
     std::string global_string;
     std::string last_comment;
-    bool should_be_array;
     std::string array_value;
 }
 
@@ -92,10 +91,8 @@ callback_t begin_class_state(MetaConfiguration& conf, std::ifstream& f, int& err
         current_class->parent = old_parent;
     }
     current_class->name  = global_string;
-    current_class->is_array = should_be_array;
-    should_be_array = false;
 
-    qCDebug(parser) << "class found: " << current_class->name << ", is_array = " << current_class->is_array
+    qCDebug(parser) << "class found: " << current_class->name
               <<", value = " << array_value;
 
     global_string.clear();
@@ -122,6 +119,13 @@ callback_t begin_property_state(MetaConfiguration& conf, std::ifstream& f, int& 
 
     boost::trim(global_string);
     current_property = std::make_shared<MetaProperty>();
+
+    if (global_string == "enum") {
+        current_property->is_enum = true;
+        f >> global_string;
+        qCDebug(parser) << "Enum with type" << global_string;
+    }
+
     current_property->type = global_string;
     current_property->parent = current_class;
     global_string.clear();
@@ -198,39 +202,6 @@ callback_t end_property_state(MetaConfiguration& conf, std::ifstream& f, int& er
     current_property = nullptr;
     return class_state;
 }
-
-#if 0
-callback_t begin_array_state(MetaConfiguration& conf, std::ifstream& f, int& error) {
-    f.ignore();
-    should_be_array = true;
-    return array_state;
-}
-
-callback_t array_state(MetaConfiguration& conf, std::ifstream& f, int& error) {
-        clear_empty(f);
-        char c = f.peek();
-        if (c >= '0' && c <= '9') {
-            char value[10];
-            f.getline(value, 10, ']');
-            array_value = value;
-            return end_array_state;
-        } else if (c == ']') {
-            return end_array_state;
-        }
-        //TODO: error handling.
-        return nullptr;
-}
-
-callback_t end_array_state(MetaConfiguration& conf, std::ifstream& f, int& error) {
-    f.ignore();
-    if (current_property) {
-        return property_state;
-    } else if (current_class) {
-        return class_state;
-    }
-    return nullptr;
-}
-#endif
 
 /* Start the default stuff -- classes,  includes and documentation. */
 callback_t initial_state(MetaConfiguration& conf, std::ifstream& f, int& error) {

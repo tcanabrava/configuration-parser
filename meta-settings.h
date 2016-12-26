@@ -19,6 +19,7 @@ struct MetaProperty {
     std::string default_value;
     std::string type;
     std::map<std::string, std::string> setters;
+    bool is_enum;
 };
 
 /* struct that represents a {} entity in the configuration file. */
@@ -28,7 +29,6 @@ struct MetaClass {
     std::vector<Ptr> subclasses;
     std::shared_ptr<MetaClass> parent = nullptr;
     std::string name;
-    bool is_array;
 };
 
 /* struct that represents the whole configuration file. */
