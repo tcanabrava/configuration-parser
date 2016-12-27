@@ -19,7 +19,6 @@ and normal c++ objects can be used if QSettings supports them, you can also spec
 and use includes and enums:
 
 #include <QString>
-#include <my-definitions.h>
 
 Preferences {
     MainWindow {
@@ -50,3 +49,4 @@ connect(Preferences::self()->mainWindow(), &MainWindow::titleChanged, [](const Q
 
 TODO:
 watch the cofiguration file on disk and act upon it's changes.
+accept includes with ""  and <>, currently just <> is accepted.

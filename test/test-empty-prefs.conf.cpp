@@ -1,4 +1,4 @@
-#include <test-empty-prefs.h>
+#include "test-empty-prefs.h"
 #include <QSettings>
 
 Preferences::Preferences(QObject *parent) : QObject(parent){

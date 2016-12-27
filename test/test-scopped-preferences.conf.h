@@ -7,9 +7,22 @@
 
 class InnerInnerPrefs1 : public QObject {
 Q_OBJECT
+Q_PROPERTY(int blah READ blah WRITE setBlah NOTIFY blahChanged)
 
 public:
-	InnerInnerPrefs1(QObject *parent = 0);
+        InnerInnerPrefs1(QObject *parent = 0);
+        int blah() const;
+        void setBlahRule(std::function<bool(int)> rule);
+
+public slots:
+        void setBlah(int value);
+
+signals:
+        void blahChanged(int value);
+
+private:
+        int _blah;
+        std::function<bool(int)> blahRule;
 };
 
 class InnerPrefs1 : public QObject {

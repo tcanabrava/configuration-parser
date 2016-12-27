@@ -1,2 +1,2 @@
-#include <test-includes.h>
+#include "test-includes.h"
 #include <QSettings>

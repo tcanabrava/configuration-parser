@@ -4,6 +4,24 @@
 InnerInnerPrefs1::InnerInnerPrefs1(QObject *parent) : QObject(parent){
 }
 
+int InnerInnerPrefs1::blah() const
+{
+	return _blah;
+}
+
+void InnerInnerPrefs1::setBlah(int value)
+{
+	if(blahRule && !blahRule(value))
+		return;
+	 _blah = value;
+	emit blahChanged(value);
+}
+
+void InnerInnerPrefs1::setBlahRule(std::function<bool(int)> rule)
+{
+	blahRule = rule;
+}
+
 InnerPrefs1::InnerPrefs1(QObject *parent) : QObject(parent),
 	_innerInnerPrefs1(new InnerInnerPrefs1(this)){
 }
@@ -33,10 +51,26 @@ InnerPrefs2* Preferences::innerPrefs2() const
 
 void Preferences::sync()
 {
+	QSettings s;
+	s.beginGroup("InnerPrefs1");
+		s.beginGroup("InnerInnerPrefs1");
+			s.setValue("blah",innerPrefs1()->innerInnerPrefs1()->blah());
+		s.endGroup();
+	s.endGroup();
+	s.beginGroup("InnerPrefs2");
+	s.endGroup();
 }
 
 void Preferences::load()
 {
+	QSettings s;
+	s.beginGroup("InnerPrefs1");
+		s.beginGroup("InnerInnerPrefs1");
+			innerPrefs1()->innerInnerPrefs1()->setBlah(s.value("blah").value<int>());
+		s.endGroup();
+	s.endGroup();
+	s.beginGroup("InnerPrefs2");
+	s.endGroup();
 }
 
 Preferences* Preferences::self()

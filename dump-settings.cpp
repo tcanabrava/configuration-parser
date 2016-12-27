@@ -1,6 +1,7 @@
 #include "dump-settings.h"
 #include "meta-settings.h"
 #include "string-helpers.h"
+#include <boost/filesystem.hpp>
 #include <cassert>
 
 Q_LOGGING_CATEGORY(dumpSource, "dumpSource")
@@ -297,8 +298,9 @@ void dump_header(const MetaConfiguration& conf, const std::string& filename) {
 }
 
 void dump_source(const MetaConfiguration& conf, const std::string& filename) {
-    std::ofstream source(filename);
-    source << "#include \"" << filename.substr(0, filename.find_last_of(".")) << ".h\"" << std::endl;
+	boost::filesystem::path path(filename);
+	std::ofstream source(path.filename().generic_string());
+    source << "#include \"" << path.stem().generic_string() << ".h\"" << std::endl;
     source << "#include <QSettings>" << std::endl;
     source << std::endl;
 
