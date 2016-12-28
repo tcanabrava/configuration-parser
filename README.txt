@@ -20,18 +20,20 @@ and use includes and enums:
 
 #include <QString>
 
-Preferences {
-    MainWindow {
-        QSize size
-        QString title
-    }
-    Network {
-        Proxy {
-            QString port
-            QString address
-        }
-        QString username = "untitled"
-    }
+napespace Pref {
+	Preferences {
+		MainWindow {
+			QSize size
+			QString title
+		}
+		Network {
+			Proxy {
+				QString port
+				QString address
+			}
+			QString username = "untitled"
+		}
+	}
 }
 
 

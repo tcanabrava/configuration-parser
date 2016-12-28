@@ -28,11 +28,20 @@ callback_t state_include(MetaConfiguration& conf, std::ifstream& f, int& error) 
 
 callback_t multi_purpose_string_state(MetaConfiguration& conf, std::ifstream& f, int& error) {
     std::vector<char> delimiters = {'{', '[', '=', ' ', '\n' };
-    while(std::find(delimiters.begin(), delimiters.end(), f.peek()) == delimiters.end()) {
-        global_string += f.get();
-    }
+    global_string += read_untill_delimiters(f, delimiters);
+    boost::trim(global_string);
 
     qCDebug(parser) << "string found: " << global_string << " next character: " << (char) f.peek();
+    if (!conf.top_level_class && global_string == "namespace") {
+        conf.conf_namespace = read_untill_delimiters(f, {'{'});
+        boost::trim(conf.conf_namespace);
+
+        f.ignore();
+        global_string.clear();
+        qCDebug(parser) << "Setting a namespace" << conf.conf_namespace;
+        return initial_state;
+    }
+
     return current_property ? nullptr // create a state for them.
         :  current_class ? class_state
         :  initial_state;
@@ -131,10 +140,7 @@ callback_t begin_property_state(MetaConfiguration& conf, std::ifstream& f, int& 
     global_string.clear();
 
     // find the name of the property
-    std::vector<char> delimiters = {'=', '\n' };
-    while(std::find(delimiters.begin(), delimiters.end(), f.peek()) == delimiters.end()) {
-        property_name += f.get();
-    }
+    property_name = read_untill_delimiters(f, {'=', '\n' });
     boost::trim(property_name);
     current_property->name = property_name;
     qCDebug(parser) << "Starting property " << property_name << " ";

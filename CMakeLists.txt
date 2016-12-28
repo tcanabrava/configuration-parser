@@ -3,6 +3,7 @@ cmake_minimum_required(VERSION 2.8)
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++1z")
 
+find_package(Boost COMPONENTS filesystem system REQUIRED)
 find_package(Qt5 REQUIRED COMPONENTS Core)
 
 include_directories(.)
@@ -18,7 +19,7 @@ set(SRCS
 )
 
 add_library(parser ${PARSER_SRCS})
-target_link_libraries(parser Qt5::Core)
+target_link_libraries(parser ${Boost_LIBRARIES} Qt5::Core)
 
 add_executable(confgen ${SRCS})
 

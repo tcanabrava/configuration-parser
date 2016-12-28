@@ -35,4 +35,5 @@ struct MetaClass {
 struct MetaConfiguration {
     std::vector<std::string> includes;
     std::shared_ptr<MetaClass> top_level_class = nullptr;
+	std::string conf_namespace;
 };

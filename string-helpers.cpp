@@ -62,3 +62,11 @@ QDebug & operator<<(QDebug& debug, const std::vector<std::string>& vector)
     }
     return debug;
 }
+
+std::string read_untill_delimiters(std::ifstream& f, const std::vector<char>& delimiters) {
+    std::string ret_string;
+    while(std::find(delimiters.begin(), delimiters.end(), f.peek()) == delimiters.end()) {
+        ret_string += f.get();
+    }
+    return ret_string;
+}

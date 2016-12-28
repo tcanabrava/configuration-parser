@@ -58,6 +58,9 @@ std::string capitalize(const std::string& s, int pos = 0);
  * */
 std::string decapitalize(const std::string& s, int pos = 0);
 
+/* read a string untill it finds a delimiter */
+std::string read_untill_delimiters(std::ifstream& f,const std::vector<char>& delimiters);
+
 /**
  * Adds support for std::string into the debug enviroment.
  */

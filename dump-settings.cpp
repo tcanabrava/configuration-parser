@@ -157,7 +157,6 @@ void dump_source_class(MetaClass *top, std::ofstream& file) {
 
     // main preferences class
     if (!top->parent) {
-
         file << "void " << top->name << "::sync()" << std::endl;
         file << '{' << std::endl;
         if (class_or_subclass_have_properties(top)) {
@@ -289,11 +288,25 @@ void dump_header(const MetaConfiguration& conf, const std::string& filename) {
     for(auto include : conf.includes) {
         header << "#include <" << include << ">" << std::endl;
     }
+
     if (conf.includes.size()) {
         header << std::endl;
     }
+
+    if (conf.conf_namespace.size()) {
+        header << "namespace " << conf.conf_namespace << " {" << std::endl;
+    }
+
+    if (conf.includes.size()) {
+        header << std::endl;
+    }
+
     if (conf.top_level_class) {
         dump_header_class(conf.top_level_class.get(), header);
+    }
+
+    if (conf.conf_namespace.size()) {
+        header << "}" << std::endl;
     }
 }
 
@@ -304,7 +317,16 @@ void dump_source(const MetaConfiguration& conf, const std::string& filename) {
     source << "#include <QSettings>" << std::endl;
     source << std::endl;
 
+    if (conf.conf_namespace.size()) {
+        source << "namespace " << conf.conf_namespace << " {" << std::endl << std::endl;
+    }
+
+
     if (conf.top_level_class) {
         dump_source_class(conf.top_level_class.get(), source);
+    }
+
+    if (conf.conf_namespace.size()) {
+        source << "}" << std::endl;
     }
 }
