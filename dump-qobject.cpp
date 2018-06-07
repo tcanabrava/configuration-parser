@@ -177,8 +177,7 @@ void dump_header(const MetaConfiguration& conf, const std::string& filename) {
     qCDebug(dumpHeader) << "Starting to dump the source file into" << filename;
 
     std::ofstream header(filename);
-    header << "#ifndef __" << filename << "__h" << std::endl;
-    header << "#define __" << filename << "__h" << std::endl;
+    begin_header_guards(header, filename);
 
     header << std::endl;
     header << "#include <QObject>" << std::endl;
@@ -207,7 +206,7 @@ void dump_header(const MetaConfiguration& conf, const std::string& filename) {
         header << "}" << std::endl;
     }
 
-    header << "#endif __" << filename << "__h" << std::endl;
+    end_header_guards(header, filename);
 }
 
 void dump_source(const MetaConfiguration& conf, const std::string& filename) {

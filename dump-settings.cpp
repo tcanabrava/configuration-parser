@@ -114,6 +114,7 @@ void dump_source_class(MetaClass *top, std::ofstream& file) {
             file << ',' << std::endl << "\t_" << p->name << '(' << p->default_value << ')';
         }
     }
+    file << std::endl;
     file << '{' << std::endl;
     file << '}' << std::endl;
     file << std::endl;
@@ -138,8 +139,9 @@ void dump_source_class(MetaClass *top, std::ofstream& file) {
     for(auto&& p : top->properties) {
         file << "void " << top->name << "::set" << capitalize(p->name,0) << '(' << p->type << " value)" << std::endl;
         file << '{' << std::endl;
-        file << "\tif(" << p->name << "Rule && !" << p->name << "Rule(value))" << std::endl;
+        file << "\tif (" << p->name << "Rule && !" << p->name << "Rule(value)) {" << std::endl;
         file << "\t\treturn;" << std::endl;
+        file << "\t}" << std::endl;
         file << "\t _" << p->name << " = value;" << std::endl;
         file << "\temit " << p->name << "Changed(value);" << std::endl;
         file << '}' << std::endl;
@@ -226,12 +228,12 @@ void dump_header_class(MetaClass *top, std::ofstream& file) {
     }
 
     file << "class " << top->name << " : public QObject {"  << std::endl;
-    file << "Q_OBJECT" << std::endl;
+    file << "\tQ_OBJECT" << std::endl;
 
     // Q_PROPERTY declarations
     qCDebug(dumpHeader) << "Class has:"  << top->properties.size() <<"properties.";
     for(auto&& p : top->properties) {
-        file << "Q_PROPERTY(" << p->type << " "
+        file << "\tQ_PROPERTY(" << p->type << " "
              << camel_case_to_underscore(p->name)
              << " READ " << p->name
              << " WRITE set" << capitalize(p->name, 0)
@@ -278,7 +280,8 @@ void dump_header(const MetaConfiguration& conf, const std::string& filename) {
     qCDebug(dumpHeader) << "Starting to dump the source file into" << filename;
 
     std::ofstream header(filename);
-    header << "#pragma once" << std::endl;
+    begin_header_guards(header, filename);
+
     header << std::endl;
     header << "#include <functional>" << std::endl;
     header << "#include <QObject>" << std::endl;
@@ -308,6 +311,8 @@ void dump_header(const MetaConfiguration& conf, const std::string& filename) {
     if (conf.conf_namespace.size()) {
         header << "}" << std::endl;
     }
+
+    end_header_guards(header, filename);
 }
 
 void dump_source(const MetaConfiguration& conf, const std::string& filename) {
