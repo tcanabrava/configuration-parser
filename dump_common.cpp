@@ -35,7 +35,7 @@ void dump_source_set_methods(std::ofstream& f, MetaClass *top) {
 
 void dump_parameter(std::ofstream& file, const std::shared_ptr<MetaProperty>& p)
 {
-    if (pass_as_const_ref(p->name)) {
+    if (pass_as_const_ref(p->type)) {
         file << "const " << p->type << "&";
     } else {
         file << p->type;
