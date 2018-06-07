@@ -12,6 +12,7 @@ set(PARSER_SRCS
 	string-helpers.cpp
 	statemachine.cpp
 	dump-settings.cpp
+	dump_common.cpp
 )
 
 set(configurationGeneration_SRCS

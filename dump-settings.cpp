@@ -1,4 +1,5 @@
 #include "dump-settings.h"
+#include "dump_common.h"
 #include "meta-settings.h"
 #include "string-helpers.h"
 #include <boost/filesystem.hpp>
@@ -128,14 +129,7 @@ void dump_source_class(MetaClass *top, std::ofstream &file) {
   file << std::endl;
 
   // get - methods.
-  for (auto &&p : top->properties) {
-    file << p->type << ' ' << top->name << "::" << p->name << "() const"
-         << std::endl;
-    file << '{' << std::endl;
-    file << "\treturn _" << p->name << ';' << std::endl;
-    file << '}' << std::endl;
-    file << std::endl;
-  }
+  dump_source_get_methods(file, top);
   for (auto &&c : top->subclasses) {
     file << c->name << "* " << top->name << "::" << decapitalize(c->name)
          << "() const" << std::endl;
@@ -146,19 +140,7 @@ void dump_source_class(MetaClass *top, std::ofstream &file) {
   }
 
   // set-methods
-  for (auto &&p : top->properties) {
-    file << "void " << top->name << "::set" << capitalize(p->name, 0) << '('
-         << p->type << " value)" << std::endl;
-    file << '{' << std::endl;
-    file << "\tif (" << p->name << "Rule && !" << p->name << "Rule(value)) {"
-         << std::endl;
-    file << "\t\treturn;" << std::endl;
-    file << "\t}" << std::endl;
-    file << "\t _" << p->name << " = value;" << std::endl;
-    file << "\temit " << p->name << "Changed(value);" << std::endl;
-    file << '}' << std::endl;
-    file << std::endl;
-  }
+  dump_source_set_methods(file, top);
 
   // rule-methods {
   for (auto &&p : top->properties) {
@@ -196,48 +178,15 @@ void dump_source_class(MetaClass *top, std::ofstream &file) {
   }
 }
 
-void dump_header_properties(
-    std::ofstream &file,
-    const std::vector<std::shared_ptr<MetaProperty>> &properties,
-    bool &has_private) {
-  if (!properties.size())
-    return;
-
-  for (auto &&p : properties) {
-    file << "\t" << p->type << " " << p->name << "() const;" << std::endl;
-    file << "\tvoid set" << capitalize(p->name, 0) << "Rule(std::function<bool("
-         << p->type << ")> rule);" << std::endl;
-  }
-
-  file << std::endl << "public slots:" << std::endl;
-  for (auto &&p : properties)
-    file << "\tvoid set" << capitalize(p->name, 0) << "(" << p->type
-         << " value);" << std::endl;
-
-  file << std::endl << "signals:" << std::endl;
-  for (auto &&p : properties)
-    file << "\tvoid " << p->name << "Changed(" << p->type << " value);"
-         << std::endl;
-
-  file << std::endl << "private:" << std::endl;
-  has_private = true;
-  for (auto &&p : properties) {
-    file << "\t" << p->type << " _" << p->name << ";" << std::endl;
-    file << "\tstd::function<bool(" << p->type << ")> " << p->name << "Rule;"
-         << std::endl;
-  }
-}
-
 void dump_header_subclasses(
     std::ofstream &file,
     const std::vector<std::shared_ptr<MetaClass>> &subclasses,
-    bool &has_private) {
+    bool has_private) {
   if (!subclasses.size())
     return;
 
   if (!has_private) {
     file << std::endl << "private:" << std::endl;
-    has_private = true;
   }
 
   for (auto &&child : subclasses)
@@ -285,12 +234,11 @@ void dump_header_class(MetaClass *top, std::ofstream &file) {
          << "() const;" << std::endl;
   }
 
-  bool has_private = false;
-  dump_header_properties(file, top->properties, has_private);
-  dump_header_subclasses(file, top->subclasses, has_private);
+  dump_header_properties(file, top->properties);
+  dump_header_subclasses(file, top->subclasses, !top->properties.empty());
 
   if (!top->parent) {
-    if (!has_private) {
+    if (!top->properties.empty() || top->subclasses.empty()) {
       file << std::endl << "private:" << std::endl;
     }
     file << "\t" << top->name << "(QObject *parent = 0);" << std::endl;

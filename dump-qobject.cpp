@@ -1,4 +1,5 @@
 #include "dump-settings.h"
+#include "dump_common.h"
 #include "meta-settings.h"
 #include "string-helpers.h"
 #include <boost/filesystem.hpp>
@@ -22,57 +23,8 @@ void dump_source_class(MetaClass *top, std::ofstream &file) {
   file << '}' << std::endl;
   file << std::endl;
 
-  // get - methods.
-  for (auto &&p : top->properties) {
-    file << p->type << ' ' << top->name << "::" << p->name << "() const"
-         << std::endl;
-    file << '{' << std::endl;
-    file << "\treturn _" << p->name << ';' << std::endl;
-    file << '}' << std::endl;
-    file << std::endl;
-  }
-
-  // set-methods
-  for (auto &&p : top->properties) {
-    file << "void " << top->name << "::set" << capitalize(p->name, 0) << '('
-         << p->type << " value)" << std::endl;
-    file << '{' << std::endl;
-    file << "\tif(_" << p->name << "=="
-         << "value)" << std::endl;
-    file << "\t\treturn;" << std::endl;
-    file << "\t _" << p->name << " = value;" << std::endl;
-    file << "\temit " << p->name << "Changed(value);" << std::endl;
-    file << '}' << std::endl;
-    file << std::endl;
-  }
-
-  // main preferences class
-}
-
-void dump_header_properties(
-    std::ofstream &file,
-    const std::vector<std::shared_ptr<MetaProperty>> &properties) {
-  if (!properties.size())
-    return;
-
-  for (auto &&p : properties) {
-    file << "\t" << p->type << " " << p->name << "() const;" << std::endl;
-  }
-
-  file << std::endl << "public slots:" << std::endl;
-  for (auto &&p : properties)
-    file << "\tvoid set" << capitalize(p->name, 0) << "(" << p->type
-         << " value);" << std::endl;
-
-  file << std::endl << "signals:" << std::endl;
-  for (auto &&p : properties)
-    file << "\tvoid " << p->name << "Changed(" << p->type << " value);"
-         << std::endl;
-
-  file << std::endl << "private:" << std::endl;
-  for (auto &&p : properties) {
-    file << "\t" << p->type << " _" << p->name << ";" << std::endl;
-  }
+  dump_source_get_methods(file, top);
+  dump_source_set_methods(file, top);
 }
 
 void dump_header_class(MetaClass *top, std::ofstream &file) {
