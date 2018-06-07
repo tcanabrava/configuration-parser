@@ -1,4 +1,5 @@
-#pragma once
+#ifndef META_SETTINGS_H
+#define META_SETTINGS_H
 
 #include <fstream>
 #include <functional>
@@ -37,3 +38,5 @@ struct MetaConfiguration {
   std::shared_ptr<MetaClass> top_level_class = nullptr;
   std::string conf_namespace;
 };
+
+#endif

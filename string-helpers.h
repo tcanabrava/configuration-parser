@@ -1,4 +1,5 @@
-#pragma once
+#ifndef STRING_HELPERS
+#define STRING_HELPERS
 
 #include <fstream>
 #include <iostream>
@@ -7,8 +8,6 @@
 #include <vector>
 
 #include <QLoggingCategory>
-
-Q_DECLARE_LOGGING_CATEGORY(stringDbg)
 
 /**
  * clear empty characters (spaces, line breaks)
@@ -83,3 +82,5 @@ QDebug& operator<<(QDebug& debug, const std::vector<T>& vector) {
 
 void begin_header_guards(std::ofstream &f, const std::string &filename);
 void end_header_guards(std::ofstream &f, const std::string &filename);
+
+#endif

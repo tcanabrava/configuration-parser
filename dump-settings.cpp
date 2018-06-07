@@ -1,9 +1,10 @@
 #include "dump-settings.h"
 #include "dump_common.h"
-#include "meta-settings.h"
 #include "string-helpers.h"
+
+#include <QLoggingCategory>
 #include <boost/filesystem.hpp>
-#include <cassert>
+
 
 Q_LOGGING_CATEGORY(dumpSource, "dumpSource")
 Q_LOGGING_CATEGORY(dumpHeader, "dumpHeader")
