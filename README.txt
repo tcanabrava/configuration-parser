@@ -1,4 +1,45 @@
-this is a simple configuration parser for QSettings based projects.
+this is a simple configuration parser for QSettings or QObject based projects.
+
+purpose of the QObject generator:
+Q_PROPERTY is annoying.
+1 - you need to define the property
+2 - you need to define the get, set and noify on the header
+3 - you need to define the get, set and call nofity in the source
+
+one line of Q_PROPERTY will easily be +10 lines in total, making it
+cumberstome to program, and if your Object talks to Qml, everything 
+that Qml touches needs to be Q_PROPERTY.
+
+this generator will transform a Qml like object into a pair of header/source with
+a default implementation so you can start working faster.
+
+Example: exposedobj.conf
+
+ExposedObjectToQml {
+    int value
+    QString name
+}
+
+generates the exposedobj.h / cpp with:
+
+class ExposedObjectToQml {
+Q_OBJECT(int value READ value WRITE setValye NOTIFY valueChanged)
+Q_OBJECT(QString name READ name WRITE setName NOTIFY nameChangeD)
+
+signals:
+   void valueChanged(int value);
+   void nameChanged(const QString& name);
+
+slots:
+   void setValue(int value);
+   void setName(const QString& name);
+
+public:
+   int value() const;
+   QString name() const;
+}
+
+and also the corresponding code in the .cpp file for the get and set fucntions.
 
 Purpose:
 QSettings works nicely but we have a problem with runtime errors as it's impossible for QSettings

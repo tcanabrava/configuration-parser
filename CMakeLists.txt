@@ -14,16 +14,24 @@ set(PARSER_SRCS
 	dump-settings.cpp
 )
 
-set(SRCS
+set(configurationGeneration_SRCS
+	dump-settings.cpp
+	main.cpp
+)
+
+set(QObjectGeneration_SRCS
+	dump-qobject.cpp
 	main.cpp
 )
 
 add_library(parser ${PARSER_SRCS})
 target_link_libraries(parser ${Boost_LIBRARIES} Qt5::Core)
 
-add_executable(confgen ${SRCS})
-
+add_executable(confgen ${configurationGeneration_SRCS})
 target_link_libraries(confgen parser Qt5::Core)
+
+add_executable(qtobjgen ${QObjectGeneration_SRCS})
+target_link_libraries(qtobjgen parser Qt5::Core)
 
 enable_testing()
 add_subdirectory(test)
