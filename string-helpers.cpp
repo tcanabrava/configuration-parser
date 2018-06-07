@@ -3,81 +3,76 @@
 
 Q_LOGGING_CATEGORY(stringDbg, "stringDbg")
 
-std::string camel_case_to_underscore(const std::string& s) {
-    std::string ret;
-    for(int i = 0, end = s.size(); i < end; i++){
-        char x = s[i];
-        if (x >= 'A' && x <= 'Z') {
-            if (i != 0) {
-                ret += '_';
-            }
-            ret += (char) (x | 32);
-        } else {
-            ret += x;
-        }
+std::string camel_case_to_underscore(const std::string &s) {
+  std::string ret;
+  for (int i = 0, end = s.size(); i < end; i++) {
+    char x = s[i];
+    if (x >= 'A' && x <= 'Z') {
+      if (i != 0) {
+        ret += '_';
+      }
+      ret += (char)(x | 32);
+    } else {
+      ret += x;
     }
-    return ret;
+  }
+  return ret;
 }
 
-std::string underscore_to_camel_case(const std::string& s) {
-    std::string ret;
-    for(int i = 0, end = s.size()-1; i < end; ++i) {
-        if (s[i] == '_') {
-            ret += s[i+1] ^ 32;
-            continue;
-        }
-        ret += s[i];
+std::string underscore_to_camel_case(const std::string &s) {
+  std::string ret;
+  for (int i = 0, end = s.size() - 1; i < end; ++i) {
+    if (s[i] == '_') {
+      ret += s[i + 1] ^ 32;
+      continue;
     }
-    return ret;
+    ret += s[i];
+  }
+  return ret;
 }
 
-std::string capitalize(const std::string& s, int pos) {
-    std::string ret = s;
-    ret[pos] ^= 32;
-    return ret;
+std::string capitalize(const std::string &s, int pos) {
+  std::string ret = s;
+  ret[pos] ^= 32;
+  return ret;
 }
 
-std::string decapitalize(const std::string& s, int pos)
-{
-    std::string ret = s;
-    ret[pos] |= 32;
-    return ret;
+std::string decapitalize(const std::string &s, int pos) {
+  std::string ret = s;
+  ret[pos] |= 32;
+  return ret;
 }
 
-void clear_empty(std::ifstream& f) {
-    while(f.peek() == ' '  || f.peek() == '\n'){
-        f.ignore();
-    }
+void clear_empty(std::ifstream &f) {
+  while (f.peek() == ' ' || f.peek() == '\n') {
+    f.ignore();
+  }
 }
 
-QDebug & operator<<(QDebug& debug,const std::string& s)
-{
-    debug << s.c_str();
+QDebug &operator<<(QDebug &debug, const std::string &s) { debug << s.c_str(); }
+
+QDebug &operator<<(QDebug &debug, const std::vector<std::string> &vector) {
+  for (const std::string &str : vector) {
+    debug << "\n" << str;
+  }
+  return debug;
 }
 
-QDebug & operator<<(QDebug& debug, const std::vector<std::string>& vector)
-{
-    for(const std::string& str : vector) {
-        debug << "\n" << str;
-    }
-    return debug;
+std::string read_untill_delimiters(std::ifstream &f,
+                                   const std::vector<char> &delimiters) {
+  std::string ret_string;
+  while (std::find(delimiters.begin(), delimiters.end(), f.peek()) ==
+         delimiters.end()) {
+    ret_string += f.get();
+  }
+  return ret_string;
 }
 
-std::string read_untill_delimiters(std::ifstream& f, const std::vector<char>& delimiters) {
-    std::string ret_string;
-    while(std::find(delimiters.begin(), delimiters.end(), f.peek()) == delimiters.end()) {
-        ret_string += f.get();
-    }
-    return ret_string;
+void begin_header_guards(std::ofstream &f, const std::string &filename) {
+  f << "#ifndef __" << filename << "__h" << std::endl;
+  f << "#define __" << filename << "__h" << std::endl;
 }
 
-void begin_header_guards(std::ofstream& f, const std::string& filename)
-{
-    f << "#ifndef __" << filename << "__h" << std::endl;
-    f << "#define __" << filename << "__h" << std::endl;
-}
-
-void end_header_guards(std::ofstream& f, const std::string& filename)
-{
-    f << "#endif // __" << filename << "__h" << std::endl;
+void end_header_guards(std::ofstream &f, const std::string &filename) {
+  f << "#endif // __" << filename << "__h" << std::endl;
 }

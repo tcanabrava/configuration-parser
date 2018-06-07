@@ -1,34 +1,50 @@
-#include <iostream>
 #include <fstream>
+#include <iostream>
 #include <string>
 
-#include "meta-settings.h"
-#include "string-helpers.h"
-#include "statemachine.h"
 #include "dump-settings.h"
+#include "meta-settings.h"
+#include "statemachine.h"
+#include "string-helpers.h"
 
-void show_usage() {
-    std::cout << "usage: qobject-compiler file (without the .conf)" << std::endl;
+#include <QDebug>
+#include <QFileInfo>
+
+void show_usage(const char appname[]) {
+  qDebug() << "usage" << appname << "file.conf";
+  qDebug() << "\t this will generate a header / source pair";
+  qDebug() << "\t with everything you need to start coding.";
 }
 
 int main(int argc, char *argv[]) {
-    if (argc < 2) {
-        show_usage();
-        return 0;
-    }
+  if (argc != 2) {
+    show_usage(argv[0]);
+    return 0;
+  }
 
-    std::string filename(argv[1]);
-    std::ifstream file(filename);
+  std::string filename(argv[1]);
+  if (filename == "-h" || filename == "--help") {
+    show_usage(argv[0]);
+    return 0;
+  }
 
-    if ( (file.rdstate() & std::ifstream::failbit) != 0) {
-        std::cerr << "could not open file." << std::endl;
-    }
+  QFileInfo info(argv[1]);
+  if (!info.exists()) {
+    qDebug() << "The specified file doesn't exist: " << info.fileName();
+    return 0;
+  }
 
-    MetaConfiguration conf = parse_configuration(file);
+  std::ifstream file(filename);
+  if ((file.rdstate() & std::ifstream::failbit) != 0) {
+    qDebug() << "could not open file.";
+    return 0;
+  }
 
-    int substrSize = filename.find_last_of('.');
-    std::string name_without_ext = filename.substr(0, substrSize);
+  MetaConfiguration conf = parse_configuration(file);
 
-    dump_header(conf, name_without_ext + ".h");
-    dump_source(conf, name_without_ext + ".cpp");
+  int substrSize = filename.find_last_of('.');
+  std::string name_without_ext = filename.substr(0, substrSize);
+
+  dump_header(conf, name_without_ext + ".h");
+  dump_source(conf, name_without_ext + ".cpp");
 }
