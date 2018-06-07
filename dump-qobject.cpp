@@ -36,11 +36,7 @@ void dump_header_class(MetaClass *top, std::ofstream &file) {
   // Q_PROPERTY declarations
   qCDebug(dumpHeader) << "Class has:" << top->properties.size()
                       << "properties.";
-  for (auto &&p : top->properties) {
-    file << "Q_PROPERTY(" << p->type << " " << camel_case_to_underscore(p->name)
-         << " READ " << p->name << " WRITE set" << capitalize(p->name, 0)
-         << " NOTIFY " << p->name << "Changed)" << std::endl;
-  }
+  dump_header_q_properties(file, top->properties);
 
   file << std::endl;
   file << "public:" << std::endl;
