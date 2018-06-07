@@ -18,7 +18,7 @@ void dump_source_class(MetaClass *top, std::ofstream &file) {
            << "\t_" << p->name << '(' << p->default_value << ')';
     }
   }
-
+  file << std::endl;
   file << '{' << std::endl;
   file << '}' << std::endl;
   file << std::endl;
