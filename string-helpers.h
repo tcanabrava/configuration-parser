@@ -1,5 +1,4 @@
-#ifndef STRING_HELPERS
-#define STRING_HELPERS
+#pragma once
 
 #include <fstream>
 #include <iostream>
@@ -82,5 +81,3 @@ QDebug& operator<<(QDebug& debug, const std::vector<T>& vector) {
 
 void begin_header_guards(std::ofstream &f, const std::string &filename);
 void end_header_guards(std::ofstream &f, const std::string &filename);
-
-#endif
