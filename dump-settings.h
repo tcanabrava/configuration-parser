@@ -1,5 +1,4 @@
-#ifndef DUMP_SETTINGS_H
-#define DUMP_SETTINGS_H
+#pragma once
 
 #include <string>
 
@@ -10,5 +9,3 @@ void dump_header(const MetaConfiguration &config, const std::string &filename);
 
 /* generates the source fole for the configuration */
 void dump_source(const MetaConfiguration &config, const std::string &filename);
-
-#endif
