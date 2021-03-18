@@ -280,8 +280,8 @@ void dump_header(const MetaConfiguration &conf, const std::string &filename) {
 }
 
 void dump_source(const MetaConfiguration &conf, const std::string &filename) {
+  std::ofstream source(filename);
   boost::filesystem::path path(filename);
-  std::ofstream source(path.filename().generic_string());
   source << "#include \"" << path.stem().generic_string() << ".h\""
          << std::endl;
   source << "#include <QSettings>" << std::endl;
