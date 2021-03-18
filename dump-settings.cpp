@@ -277,8 +277,6 @@ void dump_header(const MetaConfiguration &conf, const std::string &filename) {
   if (conf.conf_namespace.size()) {
     header << "}" << std::endl;
   }
-
-  end_header_guards(header, filename);
 }
 
 void dump_source(const MetaConfiguration &conf, const std::string &filename) {
