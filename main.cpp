@@ -44,6 +44,7 @@ int main(int argc, char *argv[]) {
 
   int substrSize = filename.find_last_of('.');
   std::string name_without_ext = filename.substr(0, substrSize);
+  qDebug() << "Trying to save" << name_without_ext;
 
   dump_header(conf, name_without_ext + ".h");
   dump_source(conf, name_without_ext + ".cpp");

@@ -9,7 +9,16 @@ function(compile_configuration outfiles)
 
     foreach(it ${configuration_files})
         get_filename_component(it ${it} ABSOLUTE)
-        message("File to process ${it}")
+        get_filename_component(_FILENAME_ ${it} NAME_WLE)
+        message("File to process ${_FILENAME_}")
+
+        add_custom_command(
+            OUTPUT "${_FILENAME_}.cpp"
+            COMMAND confgen ${it}
+            WORKING_DIRECTORY ${CMAKE_BUILD_FOLDER}
+        )
+
+        list(APPEND outfiles "${_FILENAME_}.cpp")
     endforeach()
-    # set(${outfiles} ${${outfiles}} PARENT_SCOPE)
+    set(${outfiles} ${${outfiles}} PARENT_SCOPE)
 endfunction()
