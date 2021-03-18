@@ -72,10 +72,5 @@ std::string read_untill_delimiters(std::ifstream &f,
 }
 
 void begin_header_guards(std::ofstream &f, const std::string &filename) {
-  f << "#ifndef __" << filename << "__h" << std::endl;
-  f << "#define __" << filename << "__h" << std::endl;
-}
-
-void end_header_guards(std::ofstream &f, const std::string &filename) {
-  f << "#endif // __" << filename << "__h" << std::endl;
+  f << "#pragma once" << std::endl;
 }
