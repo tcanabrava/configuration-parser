@@ -247,8 +247,10 @@ void dump_header(const MetaConfiguration &conf, const std::string &filename) {
 
   std::ofstream header(filename);
   begin_header_guards(header, filename);
-
   header << std::endl;
+
+  dump_notice(header);
+
   header << "#include <functional>" << std::endl;
   header << "#include <QObject>" << std::endl;
 
@@ -282,6 +284,9 @@ void dump_header(const MetaConfiguration &conf, const std::string &filename) {
 void dump_source(const MetaConfiguration &conf, const std::string &filename) {
   std::ofstream source(filename);
   boost::filesystem::path path(filename);
+
+  dump_notice(source);
+
   source << "#include \"" << path.stem().generic_string() << ".h\""
          << std::endl;
   source << "#include <QSettings>" << std::endl;
