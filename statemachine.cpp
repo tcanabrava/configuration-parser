@@ -207,6 +207,7 @@ callback_t property_state(MetaConfiguration &conf, std::ifstream &f,
       return end_property_state;
     }
   }
+  return nullptr;
 }
 
 callback_t end_property_state(MetaConfiguration &conf, std::ifstream &f,
