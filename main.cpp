@@ -9,6 +9,7 @@
 
 #include <QDebug>
 #include <QFileInfo>
+#include <filesystem>
 
 void show_usage(const char appname[]) {
   qDebug() << "usage" << appname << "file.conf";
@@ -42,10 +43,14 @@ int main(int argc, char *argv[]) {
 
   MetaConfiguration conf = parse_configuration(file);
 
-  int substrSize = filename.find_last_of('.');
-  std::string name_without_ext = filename.substr(0, substrSize);
-  qDebug() << "Trying to save" << name_without_ext;
+  std::string outfile = std::filesystem::path(filename).filename();
+
+  int substrSize = outfile.find_last_of('.');
+  std::string name_without_ext = outfile.substr(0, substrSize);
 
   dump_header(conf, name_without_ext + ".h");
   dump_source(conf, name_without_ext + ".cpp");
+
+  qDebug() << "files generated" << std::filesystem::absolute(name_without_ext + ".h");
+  qDebug() << "files generated" << std::filesystem::absolute(name_without_ext + ".cpp");
 }
