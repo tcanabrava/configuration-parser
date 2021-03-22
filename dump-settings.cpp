@@ -211,7 +211,7 @@ void dump_header_class(MetaClass *top, std::ofstream &file) {
 
   for (auto &&child : top->subclasses) {
     file << "Q_PROPERTY(QObject* " << camel_case_to_underscore(child->name)
-         << " MEMBER _" << decapitalize(child->name, 0) << " CONSTANT);"
+         << " MEMBER _" << decapitalize(child->name, 0) << " CONSTANT)"
          << std::endl;
   }
 
