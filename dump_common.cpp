@@ -50,6 +50,8 @@ void dump_header_properties(std::ofstream &file, const std::vector<std::shared_p
 
   for (auto &&p : properties) {
     file << "\t" << p->type << " " << p->name << "() const;" << std::endl;
+    file << "\tvoid set" << capitalize(p->name, 0) << "Rule(std::function<bool("
+         << p->type << ")> rule);" << std::endl;
   }
 
   file << std::endl << "public slots:" << std::endl;
@@ -69,6 +71,7 @@ void dump_header_properties(std::ofstream &file, const std::vector<std::shared_p
   file << std::endl << "private:" << std::endl;
   for (auto &&p : properties) {
     file << "\t" << p->type << " _" << p->name << ";" << std::endl;
+    file << "\tstd::function<bool(" << p->type << ")> " << p->name << "Rule;" << std::endl;
   }
 }
 
