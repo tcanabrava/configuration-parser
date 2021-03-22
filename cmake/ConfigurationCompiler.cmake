@@ -13,12 +13,17 @@ function(compile_configuration outfiles)
         message("File to process ${_FILENAME_}")
 
         add_custom_command(
-            OUTPUT "${_FILENAME_}.cpp"
+            OUTPUT "${_FILENAME_}.cpp" "${_FILENAME_}.h"
             COMMAND confgen ${it}
             WORKING_DIRECTORY ${CMAKE_BUILD_FOLDER}
         )
 
         list(APPEND outfiles "${_FILENAME_}.cpp")
+
+        qt5_wrap_cpp(_wrapped_moc "${CMAKE_BINARY_DIR}/${_FILENAME_}.h")
+        list(APPEND outfiles ${_wrapped_moc})
     endforeach()
+
+    message("GENERATED ${outfile}")
     set(${outfiles} ${${outfiles}} PARENT_SCOPE)
 endfunction()
