@@ -26,7 +26,10 @@ void dump_source_set_methods(std::ofstream& f, MetaClass *top) {
     f << "\tif (_" << p->name << "==" << "value) {" << std::endl;
     f << "\t\treturn;" << std::endl;
     f << "\t}" << std::endl;
-    f << "\t _" << p->name << " = value;" << std::endl;
+    f << "\tif (" << p->name << "Rule && !" << p->name << "Rule(value)) {" << std::endl;
+    f << "\t\treturn;" << std::endl;
+    f << "\t}" << std::endl;
+    f << "\t_" << p->name << " = value;" << std::endl;
     f << "\temit " << p->name << "Changed(value);" << std::endl;
     f << "}" << std::endl;
     f << std::endl;

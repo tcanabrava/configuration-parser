@@ -42,8 +42,17 @@ slots:
 public:
     int value() const;
     QString name() const;
+
+    void setValueRule(lambda-func);
+    void setNameRule(lambda-func);
 }
 ```
+
+the lambda-func should should be on this format:
+
+setValueRule([](int value) { return value < 20 && value > 0; };
+
+So you can quickly define what's appropriate for the values
 
 And also the corresponding code in the .cpp file for the get and set functions.
 
