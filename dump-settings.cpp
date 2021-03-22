@@ -126,6 +126,9 @@ void dump_source_class(MetaClass *top, std::ofstream &file) {
   }
   file << std::endl;
   file << '{' << std::endl;
+  if (!top->parent) {
+    file << "\tload();\n";
+  }
   file << '}' << std::endl;
   file << std::endl;
 
