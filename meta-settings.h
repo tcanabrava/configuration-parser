@@ -31,9 +31,15 @@ struct MetaClass {
   std::string name;
 };
 
+/*a struct to contain the includes*/
+typedef struct {
+	std::string name;
+	bool is_global;
+}MetaInclude;
+
 /* struct that represents the whole configuration file. */
 struct MetaConfiguration {
-  std::vector<std::string> includes;
+  std::vector<MetaInclude> includes;
   std::shared_ptr<MetaClass> top_level_class = nullptr;
   std::string conf_namespace;
 };

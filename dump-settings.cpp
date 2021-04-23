@@ -259,8 +259,17 @@ void dump_header(const MetaConfiguration &conf, const std::string &filename) {
 
   header << std::endl;
 
+  char delimiter_begin;
+  char delimiter_end;
+
   for (auto include : conf.includes) {
-    header << "#include <" << include << ">" << std::endl;
+    if(include.is_global) {
+    	delimiter_begin = '<';
+	delimiter_end = '>';
+    }
+    else delimiter_begin, delimiter_end = '"';
+
+    header << "#include " << delimiter_begin << include.name << delimiter_end << std::endl;
   }
 
   if (conf.includes.size()) {

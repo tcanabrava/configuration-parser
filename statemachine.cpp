@@ -22,6 +22,7 @@ callback_t state_include(MetaConfiguration &conf, std::ifstream &f,
   char include_name[80];
   char delimiter_begin;
   char delimiter_end;
+  bool is_global = false;
   f.get(delimiter_begin);
   if(delimiter_begin == '"') {
     delimiter_begin = '"';
@@ -30,10 +31,14 @@ callback_t state_include(MetaConfiguration &conf, std::ifstream &f,
   else {
     delimiter_begin = '<';
     delimiter_end = '>';
+    is_global = true;
   }
   f.ignore(256, delimiter_begin);
   f.getline(include_name, 80, delimiter_end); // read untill > or "
-  conf.includes.push_back(include_name);
+  MetaInclude temporary;
+  temporary.name = include_name;
+  temporary.is_global = is_global;
+  conf.includes.push_back(temporary);
   qCDebug(parser) << "include added: " << include_name;
   return initial_state;
 }
