@@ -81,8 +81,13 @@ void dump_source_class_settings_get_values(MetaClass *top,
     if (p->is_enum)
       file << "(" << p->type << ")";
 
-    file << "s.value(\"" << camel_case_to_underscore(p->name) << "\", " << p->default_value << " ).value<"
-         << p->type << ">());" << std::endl;
+    file << "s.value(\"" << camel_case_to_underscore(p->name) << "\"";
+
+    if (p->default_value.length() > 0) {
+        file << ", " << p->default_value;
+    }
+
+    file << ").value<" << p->type << ">());" << std::endl;
   }
   tabs.erase(0, 1);
   if (top->parent) {
