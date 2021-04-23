@@ -20,9 +20,25 @@ std::string array_value;
 callback_t state_include(MetaConfiguration &conf, std::ifstream &f,
                          int &error) {
   char include_name[80];
-  f.ignore(256, '<');
-  f.getline(include_name, 80, '>'); // read untill >
-  conf.includes.push_back(include_name);
+  char delimiter_begin;
+  char delimiter_end;
+  bool is_global = false;
+  f.get(delimiter_begin);
+  if(delimiter_begin == '"') {
+    delimiter_begin = '"';
+    delimiter_end = '"';
+  }
+  else {
+    delimiter_begin = '<';
+    delimiter_end = '>';
+    is_global = true;
+  }
+  f.ignore(256, delimiter_begin);
+  f.getline(include_name, 80, delimiter_end); // read untill > or "
+  MetaInclude temporary;
+  temporary.name = include_name;
+  temporary.is_global = is_global;
+  conf.includes.push_back(temporary);
   qCDebug(parser) << "include added: " << include_name;
   return initial_state;
 }
