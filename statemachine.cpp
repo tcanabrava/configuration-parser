@@ -20,8 +20,19 @@ std::string array_value;
 callback_t state_include(MetaConfiguration &conf, std::ifstream &f,
                          int &error) {
   char include_name[80];
-  f.ignore(256, '<');
-  f.getline(include_name, 80, '>'); // read untill >
+  char delimiter_begin;
+  char delimiter_end;
+  if(f.get() = '"') {
+    delimiter_begin = '"';
+    delimiter_end = '"'
+  }
+  else {
+    delimiter = '<';
+    delimiter_end = '>';
+  }
+  f.ignore(256, demiliter_begin);
+  f.getline(include_name, 80, delimiter_end); // read untill >
+  read
   conf.includes.push_back(include_name);
   qCDebug(parser) << "include added: " << include_name;
   return initial_state;
