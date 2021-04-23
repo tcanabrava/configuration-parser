@@ -22,15 +22,16 @@ callback_t state_include(MetaConfiguration &conf, std::ifstream &f,
   char include_name[80];
   char delimiter_begin;
   char delimiter_end;
-  if(f.get() = '"') {
+  f.get(delimiter_begin);
+  if(delimiter_begin == '"') {
     delimiter_begin = '"';
     delimiter_end = '"';
   }
   else {
-    delimiter = '<';
+    delimiter_begin = '<';
     delimiter_end = '>';
   }
-  f.ignore(256, demiliter_begin);
+  f.ignore(256, delimiter_begin);
   f.getline(include_name, 80, delimiter_end); // read untill > or "
   conf.includes.push_back(include_name);
   qCDebug(parser) << "include added: " << include_name;
