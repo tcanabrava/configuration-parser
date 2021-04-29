@@ -170,7 +170,7 @@ void dump_source_class(MetaClass *top, std::ofstream &file) {
 
   for (auto &&p : top->properties) {
     if (p->default_value.size()) {
-        file << "set" << capitalize(p->name, 0) << '(' << p->default_value << ");" << std::endl;
+        file << "\tset" << capitalize(p->name, 0) << '(' << p->default_value << ");" << std::endl;
     }
   }
   file << "}" << std::endl;
