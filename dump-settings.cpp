@@ -161,6 +161,20 @@ void dump_source_class(MetaClass *top, std::ofstream &file) {
     file << std::endl;
   }
 
+  // load defaults
+  file << "void " << top->name << "::loadDefaults()" << std::endl;
+  file << "{" << std::endl;
+  for (auto &&c : top->subclasses) {
+    file << "\t_" << decapitalize(c->name, 0) << "->loadDefaults();" << std::endl;
+  }
+
+  for (auto &&p : top->properties) {
+    if (p->default_value.size()) {
+        file << "set" << capitalize(p->name, 0) << '(' << p->default_value << ");" << std::endl;
+    }
+  }
+  file << "}" << std::endl;
+
   // main preferences class
   if (!top->parent) {
     file << "void " << top->name << "::sync()" << std::endl;
@@ -232,6 +246,8 @@ void dump_header_class(MetaClass *top, std::ofstream &file) {
     file << "\tvoid load();" << std::endl;
     file << "\tstatic " << top->name << "* self();" << std::endl;
   }
+
+  file << "\t void loadDefaults();" << std::endl;
 
   for (auto &&child : top->subclasses) {
     file << "\t" << child->name << " *" << decapitalize(child->name, 0)
