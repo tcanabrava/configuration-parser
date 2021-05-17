@@ -108,6 +108,12 @@ std::vector<std::string> find_filenames(int argc, char *argv[]) {
 int main(int argc, char *argv[]) {
     qCDebug(unittests) << "Starting unittests";
     std::vector<std::string> filenames = find_filenames(argc, argv);
+
+    if (filenames.size() == 0) {
+        qCDebug() << "Please fix the testcase."
+        return 0;
+    }
+
     assert(filenames.size());
     qCDebug(unittests) << "Testing the following files:" << filenames;
 
