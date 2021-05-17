@@ -110,7 +110,7 @@ int main(int argc, char *argv[]) {
     std::vector<std::string> filenames = find_filenames(argc, argv);
 
     if (filenames.size() == 0) {
-        qCDebug() << "Please fix the testcase."
+        qCDebug(unittests) << "Please fix the testcase.";
         return 0;
     }
 
