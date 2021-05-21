@@ -9,7 +9,7 @@ function(compile_configuration outfiles)
 
     foreach(it ${configuration_files})
         get_filename_component(it ${it} ABSOLUTE)
-        get_filename_component(_FILENAME_ ${it} NAME_WLE)
+        get_filename_component(_FILENAME_ ${it} NAME_WE)
         message("File to process ${_FILENAME_}")
 
         add_custom_command(
