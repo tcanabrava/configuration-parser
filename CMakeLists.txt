@@ -29,10 +29,10 @@ add_library(parser ${PARSER_SRCS})
 target_link_libraries(parser ${Boost_LIBRARIES} Qt5::Core)
 
 add_executable(confgen ${configurationGeneration_SRCS})
-target_link_libraries(confgen parser Qt5::Core)
+target_link_libraries(confgen parser Qt5::Core stdc++fs)
 
 add_executable(qtobjgen ${QObjectGeneration_SRCS})
-target_link_libraries(qtobjgen parser Qt5::Core)
+target_link_libraries(qtobjgen parser Qt5::Core stdc++fs)
 
 enable_testing()
 add_subdirectory(test)
