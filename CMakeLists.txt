@@ -3,6 +3,11 @@ cmake_minimum_required(VERSION 3.10)
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17")
 
+if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+    # Older versions of gcc don't link automatically to stdc++fs.
+    set(EXTRA_SYSTEM_LIBRARIES stdc++fs)
+else()
+
 find_package(Boost COMPONENTS filesystem system REQUIRED)
 find_package(Qt5 REQUIRED COMPONENTS Core)
 
@@ -29,10 +34,10 @@ add_library(parser ${PARSER_SRCS})
 target_link_libraries(parser ${Boost_LIBRARIES} Qt5::Core)
 
 add_executable(confgen ${configurationGeneration_SRCS})
-target_link_libraries(confgen parser Qt5::Core stdc++fs)
+target_link_libraries(confgen parser Qt5::Core ${EXTRA_SYSTEM_LIBRARIES})
 
 add_executable(qtobjgen ${QObjectGeneration_SRCS})
-target_link_libraries(qtobjgen parser Qt5::Core stdc++fs)
+target_link_libraries(qtobjgen parser Qt5::Core ${EXTRA_SYSTEM_LIBRARIES})
 
 enable_testing()
 add_subdirectory(test)
