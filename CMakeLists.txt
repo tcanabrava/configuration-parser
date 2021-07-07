@@ -5,7 +5,7 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
-if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+if (CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
     # Older versions of gcc don't link automatically to stdc++fs.
     set(EXTRA_SYSTEM_LIBRARIES stdc++fs)
 endif()
