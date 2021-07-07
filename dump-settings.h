@@ -2,7 +2,7 @@
 
 #include <string>
 
-class MetaConfiguration;
+struct MetaConfiguration;
 
 /* Generates the header file for the configuration */
 void dump_header(const MetaConfiguration &config, const std::string &filename);
