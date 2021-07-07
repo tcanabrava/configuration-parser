@@ -45,7 +45,7 @@ int main(int argc, char *argv[]) {
 
   std::string outfile = std::filesystem::path(filename).filename().string();
 
-  int substrSize = outfile.find_last_of('.');
+  size_t substrSize = outfile.find_last_of('.');
   std::string name_without_ext = outfile.substr(0, substrSize);
 
   dump_header(conf, name_without_ext + ".h");
