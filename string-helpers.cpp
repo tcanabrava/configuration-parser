@@ -5,7 +5,7 @@ Q_LOGGING_CATEGORY(stringDbg, "stringDbg")
 
 std::string camel_case_to_underscore(const std::string &s) {
   std::string ret;
-  for (int i = 0, end = s.size(); i < end; i++) {
+  for (size_t i = 0, end = s.size(); i < end; i++) {
     char x = s[i];
     if (x >= 'A' && x <= 'Z') {
       if (i != 0) {
@@ -21,7 +21,7 @@ std::string camel_case_to_underscore(const std::string &s) {
 
 std::string underscore_to_camel_case(const std::string &s) {
   std::string ret;
-  for (int i = 0, end = s.size() - 1; i < end; ++i) {
+  for (size_t i = 0, end = s.size() - 1; i < end; ++i) {
     if (s[i] == '_') {
       ret += s[i + 1] ^ 32;
       continue;
