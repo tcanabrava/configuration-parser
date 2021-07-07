@@ -21,6 +21,7 @@ find_package(Boost COMPONENTS filesystem system REQUIRED)
 find_package(Qt5 REQUIRED COMPONENTS Core)
 
 include_directories(.)
+include_directories(${Boost_INCLUDE_DIRS})
 
 set(PARSER_SRCS
 	string-helpers.cpp
