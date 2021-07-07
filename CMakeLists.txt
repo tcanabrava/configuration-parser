@@ -41,7 +41,7 @@ set(QObjectGeneration_SRCS
 )
 
 add_library(parser ${PARSER_SRCS})
-target_link_libraries(parser ${Boost_LIBRARIES} Qt5::Core)
+target_link_libraries(parser Boost::filesystem Qt5::Core)
 
 add_executable(confgen ${configurationGeneration_SRCS})
 target_link_libraries(confgen parser Qt5::Core ${EXTRA_SYSTEM_LIBRARIES})
