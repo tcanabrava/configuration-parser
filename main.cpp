@@ -43,7 +43,7 @@ int main(int argc, char *argv[]) {
 
   MetaConfiguration conf = parse_configuration(file);
 
-  std::string outfile = std::filesystem::path(filename).filename();
+  std::string outfile = std::filesystem::path(filename).filename().string();
 
   int substrSize = outfile.find_last_of('.');
   std::string name_without_ext = outfile.substr(0, substrSize);
@@ -51,6 +51,6 @@ int main(int argc, char *argv[]) {
   dump_header(conf, name_without_ext + ".h");
   dump_source(conf, name_without_ext + ".cpp");
 
-  qDebug() << "files generated" << std::filesystem::absolute(name_without_ext + ".h");
-  qDebug() << "files generated" << std::filesystem::absolute(name_without_ext + ".cpp");
+  qDebug() << "files generated" << std::filesystem::absolute(name_without_ext + ".h").string();
+  qDebug() << "files generated" << std::filesystem::absolute(name_without_ext + ".cpp").string();
 }
