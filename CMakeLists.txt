@@ -8,7 +8,7 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
     # Older versions of gcc don't link automatically to stdc++fs.
     set(EXTRA_SYSTEM_LIBRARIES stdc++fs)
-else()
+endif()
 
 find_package(Boost COMPONENTS filesystem system REQUIRED)
 find_package(Qt5 REQUIRED COMPONENTS Core)
