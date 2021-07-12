@@ -33,6 +33,11 @@ std::string underscore_to_camel_case(const std::string &s) {
 
 std::string capitalize(const std::string &s, int pos) {
   std::string ret = s;
+  if (pos == -1) {
+      std::transform(ret.begin(), ret.end(),ret.begin(), ::toupper);
+      return ret;
+  }
+
   ret[pos] ^= 32;
   return ret;
 }

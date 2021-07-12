@@ -231,7 +231,7 @@ void dump_header_class(
   file << "class ";
 
   if (exportExpression.size() != 0) {
-    file << exportExpression << " " << std::endl;
+    file << exportExpression << " ";
   }
 
   file << top->name << " : public QObject {" << std::endl;
@@ -292,8 +292,8 @@ void dump_header(
 
   std::string export_name;
   if (exportHeader.size() != 0) {
-    header << "#include <" << filename << ".h>" << std::endl;
-    export_name = capitalize(exportHeader) + "_EXPORT";
+    header << "#include <" << exportHeader << "_export.h>" << std::endl;
+    export_name = capitalize(exportHeader, -1) + "_EXPORT";
   }
 
   header << "#include <functional>" << std::endl;
