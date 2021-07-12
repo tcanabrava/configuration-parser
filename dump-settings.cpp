@@ -217,13 +217,24 @@ void dump_header_subclasses(
          << std::endl;
 }
 
-void dump_header_class(MetaClass *top, std::ofstream &file) {
+void dump_header_class(
+    MetaClass *top,
+    std::ofstream &file,
+    const std::string &exportExpression)
+{
+
   qCDebug(dumpHeader) << "Dumping class header";
   for (auto &&child : top->subclasses) {
-    dump_header_class(child.get(), file);
+    dump_header_class(child.get(), file, exportExpression);
   }
 
-  file << "class " << top->name << " : public QObject {" << std::endl;
+  file << "class ";
+
+  if (exportExpression.size() != 0) {
+    file << exportExpression << " " << std::endl;
+  }
+
+  file << top->name << " : public QObject {" << std::endl;
   file << "\tQ_OBJECT" << std::endl;
 
   // Q_PROPERTY declarations
@@ -266,7 +277,11 @@ void dump_header_class(MetaClass *top, std::ofstream &file) {
   file << "};" << std::endl << std::endl;
 }
 
-void dump_header(const MetaConfiguration &conf, const std::string &filename) {
+void dump_header(
+    const MetaConfiguration &conf,
+    const std::string &filename,
+    const std::string &exportHeader)
+{
   qCDebug(dumpHeader) << "Starting to dump the source file into" << filename;
 
   std::ofstream header(filename);
@@ -274,6 +289,12 @@ void dump_header(const MetaConfiguration &conf, const std::string &filename) {
   header << std::endl;
 
   dump_notice(header);
+
+  std::string export_name;
+  if (exportHeader.size() != 0) {
+    header << "#include <" << filename << ".h>" << std::endl;
+    export_name = capitalize(exportHeader) + "_EXPORT";
+  }
 
   header << "#include <functional>" << std::endl;
   header << "#include <QObject>" << std::endl;
@@ -297,7 +318,7 @@ void dump_header(const MetaConfiguration &conf, const std::string &filename) {
   }
 
   if (conf.top_level_class) {
-    dump_header_class(conf.top_level_class.get(), header);
+    dump_header_class(conf.top_level_class.get(), header, export_name);
   }
 
   if (conf.conf_namespace.size()) {
