@@ -60,7 +60,7 @@ int test_file(const std::string& filename) {
     MetaConfiguration conf = parse_configuration(file);
 
     if (check_file_exists(filename, {".conf.h"})) {
-        dump_header(conf, filename + ".h");
+        dump_header(conf, filename + ".h", "");
         if (!test_specific_file(filename, {".h", ".conf.h"})) {
             qCDebug(unittests) << "Error on" << filename << ".h";
             return -1;

@@ -46,7 +46,11 @@ void dump_header_class(MetaClass *top, std::ofstream &file) {
   file << "};" << std::endl << std::endl;
 }
 
-void dump_header(const MetaConfiguration &conf, const std::string &filename) {
+void dump_header(
+    const MetaConfiguration &conf,
+    const std::string &filename,
+    const std::string &exportHeader)
+{
   qCDebug(dumpHeader) << "Starting to dump the source file into" << filename;
 
   std::ofstream header(filename);
