@@ -14,7 +14,9 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 if (CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
     # Older versions of gcc don't link automatically to stdc++fs.
-    set(EXTRA_SYSTEM_LIBRARIES stdc++fs)
+    if(NOT APPLE)
+        set(EXTRA_SYSTEM_LIBRARIES stdc++fs)
+    endif()
 endif()
 
 find_package(Boost COMPONENTS filesystem system REQUIRED)
