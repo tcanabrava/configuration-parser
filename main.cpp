@@ -8,6 +8,7 @@
 #include "statemachine.h"
 #include "string-helpers.h"
 
+#include <QtGlobal>
 #include <QDebug>
 #include <QFileInfo>
 #include <QString>
@@ -25,12 +26,19 @@ int main(int argc, char *argv[]) {
     return 0;
   }
 
+
   std::string export_header;
   if (argc == 3) {
     QString export_file(argv[1]);
     if (!export_file.contains("--with-xport-header=")) {
         export_header = export_file
-            .split("=", Qt::SkipEmptyParts)
+            .split("=",
+#if QT_VERSION < QT_VERSION_CHECK(5, 14, 0)
+    QString::SkipEmptyParts
+#else
+    Qt::SkipEmptyParts
+#endif
+            )
             .at(1)
             .toStdString();
     }
