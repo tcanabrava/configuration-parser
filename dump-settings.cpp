@@ -233,9 +233,10 @@ void dump_header_subclasses(
     file << std::endl << "private:" << std::endl;
   }
 
-  for (auto &&child : subclasses)
+  for (auto &&child : subclasses) {
     file << "\t" << child->name << " *_" << decapitalize(child->name, 0) << ";"
          << std::endl;
+  }
 }
 
 void dump_header_class(
