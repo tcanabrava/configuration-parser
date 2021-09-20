@@ -156,9 +156,20 @@ void dump_source_class(MetaClass *top, std::ofstream &file) {
     file << "void " << top->name << "::set" << capitalize(p->name, 0)
          << "Rule(std::function<bool(" << p->type << ")> rule)" << std::endl;
     file << '{' << std::endl;
-    file << "\t" << p->name << "Rule = rule;" << std::endl;
+    file << '\t' << p->name << "Rule = rule;" << std::endl;
     file << '}' << std::endl;
     file << std::endl;
+  }
+
+  // default values
+  for (auto &&p : top->properties) {
+      if (p->default_value.size()) {
+          file << p->type << " " << top->name << "::" << p->name << "Default() const" << std::endl;
+          file << '{' << std::endl;
+          file << '\t' << "return " << p->default_value << ';' << std::endl;
+          file << '}';
+          file << std::endl;
+    }
   }
 
   // load defaults

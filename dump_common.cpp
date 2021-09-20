@@ -4,7 +4,7 @@
 #include <QList>
 #include <string>
 
-void dump_source_get_methods(std::ofstream& f, MetaClass *top) 
+void dump_source_get_methods(std::ofstream& f, MetaClass *top)
 {
   // get - methods.
   for (auto &&p : top->properties) {
@@ -55,6 +55,7 @@ void dump_header_properties(std::ofstream &file, const std::vector<std::shared_p
     file << "\t" << p->type << " " << p->name << "() const;" << std::endl;
     file << "\tvoid set" << capitalize(p->name, 0) << "Rule(std::function<bool("
          << p->type << ")> rule);" << std::endl;
+    file << "\t" << p->type << " " << p->name << "Default() const;" << std::endl;
   }
 
   file << std::endl << "public slots:" << std::endl;
@@ -63,7 +64,7 @@ void dump_header_properties(std::ofstream &file, const std::vector<std::shared_p
         dump_parameter(file, p);
     file << ");" << std::endl;
   }
-  
+
   file << std::endl << "signals:" << std::endl;
   for (auto &&p : properties) {
     file << "\tvoid " << p->name << "Changed(";
