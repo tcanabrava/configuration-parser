@@ -1,6 +1,6 @@
-function(compile_configuration outfiles)
+function(compile_configuration target_or_source_var)
     set(options)
-    set(oneValueArgs TARGET EXPORT_HEADER)
+    set(oneValueArgs EXPORT_HEADER)
     set(multiValueArgs OPTIONS DEPENDS)
 
     cmake_parse_arguments(_WRAP_CPP "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
@@ -23,18 +23,22 @@ function(compile_configuration outfiles)
     foreach(it ${configuration_files})
         get_filename_component(it ${it} ABSOLUTE)
         get_filename_component(_FILENAME_ ${it} NAME_WE)
-        message("File to process ${_FILENAME_}")
+        message("File to process ${it}")
 
         add_custom_command(
             OUTPUT "${_FILENAME_}.cpp" "${_FILENAME_}.h"
             COMMAND confgen ${EXPORT_HEADER_USAGE} ${it}
-            WORKING_DIRECTORY ${CMAKE_BUILD_FOLDER}
+            WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+            MAIN_DEPENDENCY ${it}
         )
 
-        list(APPEND outfiles "${_FILENAME_}.cpp")
-
-        qt5_wrap_cpp(_wrapped_moc "${CMAKE_BINARY_DIR}/${_FILENAME_}.h")
-        list(APPEND outfiles ${_wrapped_moc})
+        qt5_wrap_cpp(_wrapped_moc "${CMAKE_CURRENT_BINARY_DIR}/${_FILENAME_}.h")
+        if (TARGET ${target_or_source_var})
+            target_sources(${target_or_source_var} PRIVATE "${_FILENAME_}.cpp")
+            target_sources(${target_or_source_var} PRIVATE ${_wrapped_moc})
+        else()
+            set(${target_or_source_var} ${${target_or_source_var}} ${_wrapped_moc} "${_FILENAME_}.cpp" PARENT_SCOPE)
+        endif()
     endforeach()
 
     message("GENERATED ${outfile}")
