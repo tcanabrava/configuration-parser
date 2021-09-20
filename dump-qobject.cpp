@@ -1,4 +1,3 @@
-#include "dump-settings.h"
 #include "dump_common.h"
 #include "meta-settings.h"
 #include "string-helpers.h"

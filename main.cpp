@@ -3,7 +3,6 @@
 #include <string>
 #include <cstring>
 
-#include "dump-settings.h"
 #include "meta-settings.h"
 #include "statemachine.h"
 #include "string-helpers.h"
@@ -13,6 +12,17 @@
 #include <QFileInfo>
 #include <QString>
 #include <filesystem>
+
+struct MetaConfiguration;
+
+/* Generates the header file for the configuration */
+void dump_header(
+    const MetaConfiguration &config,
+    const std::string &filename,
+    const std::string &exportHeader);
+
+/* generates the source fole for the configuration */
+void dump_source(const MetaConfiguration &config, const std::string &filename);
 
 void show_usage(const char appname[]) {
   qDebug() << "usage" << appname << " [--with-export-header=header] file.conf";

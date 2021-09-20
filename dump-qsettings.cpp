@@ -1,4 +1,4 @@
-#include "dump-settings.h"
+#include "dump-qsettings.h"
 #include "dump_common.h"
 #include "string-helpers.h"
 

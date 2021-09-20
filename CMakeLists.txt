@@ -28,12 +28,11 @@ include_directories(${Boost_INCLUDE_DIRS})
 set(PARSER_SRCS
 	string-helpers.cpp
 	statemachine.cpp
-	dump-settings.cpp
 	dump_common.cpp
 )
 
 set(configurationGeneration_SRCS
-	dump-settings.cpp
+	dump-qsettings.cpp
 	main.cpp
 )
 
