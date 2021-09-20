@@ -9,6 +9,22 @@
 Q_LOGGING_CATEGORY(dumpSource, "dumpSource")
 Q_LOGGING_CATEGORY(dumpHeader, "dumpHeader")
 
+// Transforms a metaProperty into a `Parent()->OtherParent()->Property()", callable, string.
+std::string getCallChain(std::shared_ptr<MetaProperty> property, std::string suffix) {
+    std::string callchain;
+    auto tmp = property->parent;
+        if (tmp && tmp->parent) {
+        while (tmp->parent) {
+            std::string s = decapitalize(tmp->name, 0) + "()->";
+            callchain.insert(0, s);
+            tmp = tmp->parent;
+        }
+    }
+
+    callchain.append(property->name + suffix + "()");
+    return callchain;
+}
+
 void dump_source_class_settings_set_values(MetaClass *top,
                                            std::ofstream &file) {
   static std::string tabs;
@@ -25,23 +41,17 @@ void dump_source_class_settings_set_values(MetaClass *top,
 
   tabs += '\t';
   for (auto &&p : top->properties) {
-    std::string callchain;
-    file << tabs << "s.setValue(\"" << camel_case_to_underscore(p->name)
+    file << tabs << "if (" << getCallChain(p, "") << " == " << getCallChain(p, "Default") << "){" << std::endl;
+    file << tabs << "\ts.remove(\"" << camel_case_to_underscore(p->name) << "\");" << std::endl;
+    file << tabs << "} else { " << std::endl;
+    file << tabs << "\ts.setValue(\"" << camel_case_to_underscore(p->name)
          << "\",";
-    auto tmp = p->parent;
-    if (tmp && tmp->parent) {
-      while (tmp->parent) {
-        std::string s = decapitalize(tmp->name, 0) + "()->";
-        callchain.insert(0, s);
-        tmp = tmp->parent;
-      }
-    }
+
     if (p->is_enum) {
       file << "(int) ";
     }
-    if (callchain.size())
-      file << callchain;
-    file << p->name << "());" << std::endl;
+    file << getCallChain(p, "") << ");" << std::endl;
+    file << tabs << '}' << std::endl;
   }
   tabs.erase(0, 1);
   if (top->parent) {
