@@ -29,9 +29,12 @@ void dump_source_class_settings_set_values(MetaClass *top,
   std::string mainGroup = parentGroup;
 
   if (top->parent) {
+    // KConfig API uses pointers / values =[
+    std::string methodAcessor = parentGroup == "internal_config" ? "->" : ".";
+
       mainGroup = decapitalize(top->name, 0) + "Group";
     file << "\t" << "KConfigGroup " << mainGroup << " = "
-        << parentGroup << ".group(\"" << top->name << "\");" << std::endl;
+        << parentGroup << methodAcessor << "group(\"" << top->name << "\");" << std::endl;
   }
 
   for (auto &&s : top->subclasses) {
@@ -61,9 +64,11 @@ void dump_source_class_settings_get_values(MetaClass *top,
                                            const std::string& parentGroup) {
   std::string mainGroup = parentGroup;
   if (top->parent) {
+    // KConfig API uses pointers / values =[
+    std::string methodAcessor = parentGroup == "internal_config" ? "->" : ".";
     mainGroup = decapitalize(top->name, 0) + "Group";
     file << "\tKConfigGroup " << mainGroup << " = "
-        << parentGroup << ".group(\"" << top->name << "\");" << std::endl;
+        << parentGroup << methodAcessor << "group(\"" << top->name << "\");" << std::endl;
   }
 
   for (auto &&s : top->subclasses) {
@@ -194,8 +199,8 @@ void dump_source_class(MetaClass *top, std::ofstream &file) {
     file << "void " << top->name << "::sync()" << std::endl;
     file << '{' << std::endl;
     if (class_or_subclass_have_properties(top)) {
-      file << "\tKSharedConfigPtr config = KSharedConfig::openConfig();" << std::endl;
-      dump_source_class_settings_set_values(top, file, "config");
+      file << "\tKSharedConfigPtr internal_config = KSharedConfig::openConfig();" << std::endl;
+      dump_source_class_settings_set_values(top, file, "internal_config");
     }
     file << '}' << std::endl;
     file << std::endl;
@@ -204,8 +209,8 @@ void dump_source_class(MetaClass *top, std::ofstream &file) {
     file << "void " << top->name << "::load()" << std::endl;
     file << '{' << std::endl;
     if (class_or_subclass_have_properties(top)) {
-      file << "\tKSharedConfigPtr config = KSharedConfig::openConfig();" << std::endl;
-      dump_source_class_settings_get_values(top, file, "config");
+      file << "\tKSharedConfigPtr internal_config = KSharedConfig::openConfig();" << std::endl;
+      dump_source_class_settings_get_values(top, file, "internal_config");
     }
     file << '}' << std::endl;
     file << std::endl;
@@ -353,6 +358,7 @@ void dump_source(const MetaConfiguration &conf, const std::string &filename) {
          << std::endl;
   source << "#include <KConfig>" << std::endl;
   source << "#include <KConfigGroup>" << std::endl;
+  source << "#include <KSharedConfig>" << std::endl;
 
   source << std::endl;
 
