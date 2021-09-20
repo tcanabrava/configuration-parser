@@ -30,7 +30,7 @@ void dump_source_set_methods(std::ofstream& f, MetaClass *top) {
     f << "\t\treturn;" << std::endl;
     f << "\t}" << std::endl;
     f << "\t_" << p->name << " = value;" << std::endl;
-    f << "\temit " << p->name << "Changed(value);" << std::endl;
+    f << "\tQ_EMIT " << p->name << "Changed(value);" << std::endl;
     f << "}" << std::endl;
     f << std::endl;
   }
@@ -58,16 +58,15 @@ void dump_header_properties(std::ofstream &file, const std::vector<std::shared_p
     file << "\t" << p->type << " " << p->name << "Default() const;" << std::endl;
   }
 
-  file << std::endl << "public slots:" << std::endl;
+  file << std::endl << "public:" << std::endl;
   for (auto &&p : properties) {
-    file << "\tvoid set" << capitalize(p->name, 0) << "(";
+    file << "\t Q_SLOT void set" << capitalize(p->name, 0) << "(";
         dump_parameter(file, p);
     file << ");" << std::endl;
   }
 
-  file << std::endl << "signals:" << std::endl;
   for (auto &&p : properties) {
-    file << "\tvoid " << p->name << "Changed(";
+    file << "\t Q_SIGNAL void " << p->name << "Changed(";
         dump_parameter(file, p);
     file << ");" << std::endl;
   }
