@@ -41,11 +41,19 @@ set(QObjectGeneration_SRCS
 	main.cpp
 )
 
+set(DUMP_KCONFIG_SRCS
+	dump-kconfig.cpp
+	main.cpp
+)
+
 add_library(parser ${PARSER_SRCS})
 target_link_libraries(parser Boost::filesystem Qt5::Core)
 
 add_executable(confgen ${configurationGeneration_SRCS})
 target_link_libraries(confgen parser Qt5::Core ${EXTRA_SYSTEM_LIBRARIES})
+
+add_executable(kcfggen ${DUMP_KCONFIG_SRCS})
+target_link_libraries(kcfggen parser Qt5::Core ${EXTRA_SYSTEM_LIBRARIES})
 
 add_executable(qtobjgen ${QObjectGeneration_SRCS})
 target_link_libraries(qtobjgen parser Qt5::Core ${EXTRA_SYSTEM_LIBRARIES})
