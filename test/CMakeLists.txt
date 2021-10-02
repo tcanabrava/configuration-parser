@@ -1,5 +1,14 @@
+set(CMAKE_MODULE_PATH "../cmake")
+
+# Make sure the file can be compiled without errors
+add_executable(my_cmake_test test.cpp)
+target_link_libraries(my_cmake_test Qt5::Core)
+include(ConfigurationCompiler)
+compile_configuration(my_cmake_test demo.conf)
+
 #macro(TEST NAME FILE)
 	#add_executable(${NAME} ${FILE} )
+	#target_link_libraries(${NAME} ${Boost_LIBRARIES} parser Qt5::Core)
 	#target_link_libraries(${NAME} ${Boost_LIBRARIES} parser Qt5::Core)
 	#add_test(NAME ${NAME} COMMAND  $<TARGET_FILE:${NAME}>)
 #endmacro()

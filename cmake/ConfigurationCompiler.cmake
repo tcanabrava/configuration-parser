@@ -27,7 +27,7 @@ function(compile_configuration target_or_source_var)
 
         add_custom_command(
             OUTPUT "${_FILENAME_}.cpp" "${_FILENAME_}.h"
-            COMMAND confgen ${EXPORT_HEADER_USAGE} ${it}
+            COMMAND ConfigurationParser::confgen ${EXPORT_HEADER_USAGE} ${it}
             WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
             MAIN_DEPENDENCY ${it}
         )
