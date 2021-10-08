@@ -1,3 +1,8 @@
+/*
+    SPDX-FileCopyrightText: 2021 Tomaz Canabrava <tcanabrava@kde.org>
+    SPDX-License-Identifier: MIT
+*/
+
 /* State Machine to handle the configuration file. */
 #include "statemachine.h"
 #include "string-helpers.h"
