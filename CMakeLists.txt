@@ -1,3 +1,9 @@
+#=============================================================================
+# SPDX-FileCopyrightText: 2021 Tomaz Canabrava <tcanabrava@kde.org>
+#
+# SPDX-License-Identifier: MIT
+#=============================================================================
+
 project(configurationGeneration)
 cmake_minimum_required(VERSION 3.10)
 

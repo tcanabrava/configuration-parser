@@ -1,3 +1,9 @@
+#=============================================================================
+# SPDX-FileCopyrightText: 2021 Tomaz Canabrava <tcanabrava@kde.org>
+#
+# SPDX-License-Identifier: MIT
+#=============================================================================
+
 function(compile_configuration target_or_source_var)
     set(options)
     set(oneValueArgs EXPORT_HEADER)
