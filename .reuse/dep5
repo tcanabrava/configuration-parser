@@ -7,3 +7,11 @@ Files: test/*
 Copyright: 2021 Tomaz Canabrava <tcanabrava@kde.org>
 License: CC0-1.0
 
+Files: subsurface-configuration.conf
+Copyright: 2021 Tomaz Canabrava <tcanabrava@kde.org>
+License: MIT
+
+Files: README.md
+Copyright: 2021 Tomaz Canabrava <tcanabrava@kde.org>
+License: MIT
+
