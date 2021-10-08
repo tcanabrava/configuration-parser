@@ -1,7 +1,7 @@
 set(CMAKE_MODULE_PATH "../cmake")
 
 # Make sure the file can be compiled without errors
-add_executable(my_cmake_test test.cpp)
+add_library(my_cmake_test)
 target_link_libraries(my_cmake_test Qt5::Core)
 include(ConfigurationCompiler)
 compile_configuration(my_cmake_test demo.conf)
