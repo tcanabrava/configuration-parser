@@ -1,5 +1,6 @@
 #=============================================================================
 # SPDX-FileCopyrightText: 2021 Tomaz Canabrava <tcanabrava@kde.org>
+# SPDX-FileCopyrightText: Alexander Lohnau <alexander.lohnau@gmx.de>
 #
 # SPDX-License-Identifier: MIT
 #=============================================================================
