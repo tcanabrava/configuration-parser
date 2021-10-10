@@ -11,8 +11,6 @@ cmake_minimum_required(VERSION 3.10)
 if(EXISTS "${CMAKE_BINARY_DIR}/conan_paths.cmake")
     message("Found conan paths")
     include(${CMAKE_BINARY_DIR}/conan_paths.cmake)
-else()
-    message("Couldn't find conan paths")
 endif()
 
 set(CMAKE_CXX_STANDARD 17)
