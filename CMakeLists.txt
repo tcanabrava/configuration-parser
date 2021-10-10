@@ -34,47 +34,25 @@ find_package(Qt5 REQUIRED COMPONENTS Core)
 include_directories(.)
 include_directories(${Boost_INCLUDE_DIRS})
 
-set(PARSER_SRCS
-	string-helpers.cpp
-	statemachine.cpp
-	dump_common.cpp
+add_executable(
+    confgen
+    parser/statemachine.cpp
+    common/string_helpers.cpp
+    common/dump_common.cpp
+    kconfig/dump_kconfig.cpp
+    qobject/dump_qobject.cpp
+    qsettings/dump_qsettings.cpp
+    main.cpp
 )
 
-set(configurationGeneration_SRCS
-	dump-qsettings.cpp
-	main.cpp
-)
-
-set(QObjectGeneration_SRCS
-	dump-qobject.cpp
-	main.cpp
-)
-
-set(DUMP_KCONFIG_SRCS
-	dump-kconfig.cpp
-	main.cpp
-)
-
-add_library(parser ${PARSER_SRCS})
-target_link_libraries(parser Boost::filesystem Qt5::Core)
-
-add_executable(confgen ${configurationGeneration_SRCS})
-add_executable(ConfigurationParser::confgen ALIAS confgen)
-target_link_libraries(confgen parser Qt5::Core ${EXTRA_SYSTEM_LIBRARIES})
+target_link_libraries(confgen Boost::filesystem Qt5::Core ${EXTRA_SYSTEM_LIBRARIES})
 install(TARGETS confgen EXPORT ConfigurationParserTargets DESTINATION ${CMAKE_INSTALL_LIBDIR}/ConfigurationParser)
-
-add_executable(kcfggen ${DUMP_KCONFIG_SRCS})
-target_link_libraries(kcfggen parser Qt5::Core ${EXTRA_SYSTEM_LIBRARIES})
-install(TARGETS kcfggen EXPORT ConfigurationParserTargets DESTINATION ${CMAKE_INSTALL_LIBDIR}/ConfigurationParser)
-
-add_executable(qtobjgen ${QObjectGeneration_SRCS})
-target_link_libraries(qtobjgen parser Qt5::Core ${EXTRA_SYSTEM_LIBRARIES})
-install(TARGETS qtobjgen EXPORT ConfigurationParserTargets DESTINATION ${CMAKE_INSTALL_LIBDIR}/ConfigurationParser)
 
 configure_package_config_file(
     "${CMAKE_CURRENT_SOURCE_DIR}/ConfigurationParserConfig.cmake.in"
     "${CMAKE_CURRENT_BINARY_DIR}/ConfigurationParserConfig.cmake"
     INSTALL_DESTINATION "${CMAKECONFIG_INSTALL_DIR}")
+
 write_basic_package_version_file(
     "${CMAKE_CURRENT_BINARY_DIR}/ConfigurationParserConfigVersion.cmake"
     VERSION "0.0.1"
@@ -86,6 +64,7 @@ install(FILES
         "${CMAKE_CURRENT_BINARY_DIR}/ConfigurationParserConfigVersion.cmake"
         "cmake/ConfigurationCompiler.cmake"
         DESTINATION "${CMAKECONFIG_INSTALL_DIR}")
+
 install(EXPORT ConfigurationParserTargets
         DESTINATION "${CMAKECONFIG_INSTALL_DIR}"
         FILE ConfigurationParserTargets.cmake

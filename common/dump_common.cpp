@@ -3,11 +3,39 @@
     SPDX-License-Identifier: MIT
 */
 
-#include "dump_common.h"
-#include "string-helpers.h"
+#include "common/dump_common.h"
+#include "common/string_helpers.h"
 
 #include <QList>
 #include <string>
+#include <iostream>
+
+
+// Transforms a metaProperty into a `Parent()->OtherParent()->Property()", callable, string.
+std::string get_call_chain(std::shared_ptr<MetaProperty> property, std::string suffix) {
+    std::string callchain;
+    auto tmp = property->parent;
+        if (tmp && tmp->parent) {
+        while (tmp->parent) {
+            std::string s = decapitalize(tmp->name, 0) + "()->";
+            callchain.insert(0, s);
+            tmp = tmp->parent;
+        }
+    }
+
+    callchain.append(property->name + suffix + "()");
+    return callchain;
+}
+
+void dump_headers(std::ofstream& f, const std::vector<MetaInclude>& includes) {
+  for (auto include : includes) {
+    if (include.is_global) {
+      f << "#include <" << include.name << '>' << std::endl;
+    } else {
+      f << "#include \"" << include.name << '"' << std::endl;
+    }
+  }
+}
 
 void dump_source_get_methods(std::ofstream& f, MetaClass *top)
 {

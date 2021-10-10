@@ -5,7 +5,7 @@
 
 /* State Machine to handle the configuration file. */
 #include "statemachine.h"
-#include "string-helpers.h"
+#include "common/string_helpers.h"
 #include <boost/algorithm/string.hpp>
 #include <iostream>
 #include <memory>

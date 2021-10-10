@@ -33,6 +33,8 @@ struct MetaProperty {
   std::string type;
   std::map<std::string, std::string> setters;
   bool is_enum;
+
+  std::string get_call_chain();
 };
 
 /* struct that represents a {} entity in the configuration file. */

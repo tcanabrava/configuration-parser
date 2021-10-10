@@ -3,14 +3,19 @@
     SPDX-License-Identifier: MIT
 */
 
-#include "dump_common.h"
-#include "meta-settings.h"
-#include "string-helpers.h"
+#include "common/dump_common.h"
+#include "common/string_helpers.h"
+
+#include "parser/meta_settings.h"
+
 #include <boost/filesystem.hpp>
+
 #include <cassert>
 
 Q_LOGGING_CATEGORY(dumpSource, "dumpSource")
 Q_LOGGING_CATEGORY(dumpHeader, "dumpHeader")
+
+namespace {
 
 void dump_source_class(MetaClass *top, std::ofstream &file) {
   // Constructors.
@@ -50,13 +55,15 @@ void dump_header_class(MetaClass *top, std::ofstream &file) {
   file << "};" << std::endl << std::endl;
 }
 
+} // end unammed namespace
+
+namespace QObjectExport {
+
 void dump_header(
     const MetaConfiguration &conf,
     const std::string &filename,
     const std::string &exportHeader)
 {
-  qCDebug(dumpHeader) << "Starting to dump the source file into" << filename;
-
   std::ofstream header(filename);
   begin_header_guards(header, filename);
   header << std::endl;
@@ -65,13 +72,7 @@ void dump_header(
 
   header << "#include <QObject>" << std::endl;
 
-  for (auto include : conf.includes) {
-    if (include.is_global) {
-      header << "#include <" << include.name << '>' << std::endl;
-    } else {
-      header << "#include \"" << include.name << '"' << std::endl;
-    }
-  }
+  dump_headers(header, conf.includes);
 
   if (conf.includes.size()) {
     header << std::endl;
@@ -100,8 +101,7 @@ void dump_source(const MetaConfiguration &conf, const std::string &filename) {
 
   dump_notice(source);
 
-  source << "#include \"" << path.stem().generic_string() << ".h\""
-         << std::endl;
+  source << "#include \"" << path.stem().generic_string() << ".h\"" << std::endl;
   source << "#include <QSettings>" << std::endl;
   source << std::endl;
 
@@ -117,4 +117,6 @@ void dump_source(const MetaConfiguration &conf, const std::string &filename) {
   if (conf.conf_namespace.size()) {
     source << "}" << std::endl;
   }
+}
+
 }

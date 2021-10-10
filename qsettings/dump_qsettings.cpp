@@ -3,32 +3,17 @@
     SPDX-License-Identifier: MIT
 */
 
-#include "dump-qsettings.h"
-#include "dump_common.h"
-#include "string-helpers.h"
+#include "dump_qsettings.h"
+#include "common/dump_common.h"
+#include "common/string_helpers.h"
 
 #include <QLoggingCategory>
 #include <boost/filesystem.hpp>
 
+Q_LOGGING_CATEGORY(dumpQSettingsSource, "dumpSource")
+Q_LOGGING_CATEGORY(dumpQSettingsHeader, "dumpHeader")
 
-Q_LOGGING_CATEGORY(dumpSource, "dumpSource")
-Q_LOGGING_CATEGORY(dumpHeader, "dumpHeader")
-
-// Transforms a metaProperty into a `Parent()->OtherParent()->Property()", callable, string.
-std::string getCallChain(std::shared_ptr<MetaProperty> property, std::string suffix) {
-    std::string callchain;
-    auto tmp = property->parent;
-        if (tmp && tmp->parent) {
-        while (tmp->parent) {
-            std::string s = decapitalize(tmp->name, 0) + "()->";
-            callchain.insert(0, s);
-            tmp = tmp->parent;
-        }
-    }
-
-    callchain.append(property->name + suffix + "()");
-    return callchain;
-}
+namespace {
 
 void dump_source_class_settings_set_values(MetaClass *top,
                                            std::ofstream &file) {
@@ -46,7 +31,7 @@ void dump_source_class_settings_set_values(MetaClass *top,
 
   tabs += '\t';
   for (auto &&p : top->properties) {
-    file << tabs << "if (" << getCallChain(p, "") << " == " << getCallChain(p, "Default") << "){" << std::endl;
+    file << tabs << "if (" << get_call_chain(p, "") << " == " << get_call_chain(p, "Default") << "){" << std::endl;
     file << tabs << "\ts.remove(\"" << camel_case_to_underscore(p->name) << "\");" << std::endl;
     file << tabs << "} else { " << std::endl;
     file << tabs << "\ts.setValue(\"" << camel_case_to_underscore(p->name)
@@ -55,7 +40,7 @@ void dump_source_class_settings_set_values(MetaClass *top,
     if (p->is_enum) {
       file << "(int) ";
     }
-    file << getCallChain(p, "") << ");" << std::endl;
+    file << get_call_chain(p, "") << ");" << std::endl;
     file << tabs << '}' << std::endl;
   }
   tabs.erase(0, 1);
@@ -250,7 +235,7 @@ void dump_header_class(
     const std::string &exportExpression)
 {
 
-  qCDebug(dumpHeader) << "Dumping class header";
+  qCDebug(dumpQSettingsHeader) << "Dumping class header";
   for (auto &&child : top->subclasses) {
     dump_header_class(child.get(), file, exportExpression);
   }
@@ -265,7 +250,7 @@ void dump_header_class(
   file << "\tQ_OBJECT" << std::endl;
 
   // Q_PROPERTY declarations
-  qCDebug(dumpHeader) << "Class has:" << top->properties.size()
+  qCDebug(dumpQSettingsHeader) << "Class has:" << top->properties.size()
                       << "properties.";
   dump_header_q_properties(file, top->properties);
 
@@ -304,80 +289,79 @@ void dump_header_class(
   file << "};" << std::endl << std::endl;
 }
 
-void dump_header(
-    const MetaConfiguration &conf,
-    const std::string &filename,
-    const std::string &exportHeader)
-{
-  qCDebug(dumpHeader) << "Starting to dump the source file into" << filename;
+} // end unammed namespace
 
-  std::ofstream header(filename);
-  begin_header_guards(header, filename);
-  header << std::endl;
+namespace QSettingsExport {
+    void dump_header(
+        const MetaConfiguration &conf,
+        const std::string &filename,
+        const std::string &exportHeader)
+    {
+    qCDebug(dumpQSettingsHeader) << "Starting to dump the source file into" << filename;
 
-  dump_notice(header);
+    std::ofstream header(filename);
+    begin_header_guards(header, filename);
+    header << std::endl;
 
-  std::string export_name;
-  if (exportHeader.size() != 0) {
-    header << "#include <" << exportHeader << "_export.h>" << std::endl;
-    export_name = capitalize(exportHeader, -1) + "_EXPORT";
-  }
+    dump_notice(header);
 
-  header << "#include <functional>" << std::endl;
-  header << "#include <QObject>" << std::endl;
-
-  header << std::endl;
-
-  for (auto include : conf.includes) {
-    if (include.is_global) {
-      header << "#include <" << include.name << '>' << std::endl;
-    } else {
-      header << "#include \"" << include.name << '"' << std::endl;
+    std::string export_name;
+    if (exportHeader.size() != 0) {
+        header << "#include <" << exportHeader << "_export.h>" << std::endl;
+        export_name = capitalize(exportHeader, -1) + "_EXPORT";
     }
-  }
 
-  if (conf.includes.size()) {
+    header << "#include <functional>" << std::endl;
+    header << "#include <QObject>" << std::endl;
+
     header << std::endl;
-  }
 
-  if (conf.conf_namespace.size()) {
-    header << "namespace " << conf.conf_namespace << " {" << std::endl;
-  }
+    dump_headers(header, conf.includes);
 
-  if (conf.includes.size()) {
-    header << std::endl;
-  }
+    if (conf.includes.size()) {
+        header << std::endl;
+    }
 
-  if (conf.top_level_class) {
-    dump_header_class(conf.top_level_class.get(), header, export_name);
-  }
+    if (conf.conf_namespace.size()) {
+        header << "namespace " << conf.conf_namespace << " {" << std::endl;
+    }
 
-  if (conf.conf_namespace.size()) {
-    header << "}" << std::endl;
-  }
-}
+    if (conf.includes.size()) {
+        header << std::endl;
+    }
 
-void dump_source(const MetaConfiguration &conf, const std::string &filename) {
-  std::ofstream source(filename);
-  boost::filesystem::path path(filename);
+    if (conf.top_level_class) {
+        dump_header_class(conf.top_level_class.get(), header, export_name);
+    }
 
-  dump_notice(source);
+    if (conf.conf_namespace.size()) {
+        header << "}" << std::endl;
+    }
+    }
 
-  source << "#include \"" << path.stem().generic_string() << ".h\""
-         << std::endl;
-  source << "#include <QSettings>" << std::endl;
-  source << std::endl;
+    void dump_source(const MetaConfiguration &conf, const std::string &filename) {
+    std::ofstream source(filename);
+    boost::filesystem::path path(filename);
 
-  if (conf.conf_namespace.size()) {
-    source << "namespace " << conf.conf_namespace << " {" << std::endl
-           << std::endl;
-  }
+    dump_notice(source);
 
-  if (conf.top_level_class) {
-    dump_source_class(conf.top_level_class.get(), source);
-  }
+    source << "#include \"" << path.stem().generic_string() << ".h\""
+            << std::endl;
+    source << "#include <QSettings>" << std::endl;
+    source << std::endl;
 
-  if (conf.conf_namespace.size()) {
-    source << "}" << std::endl;
-  }
+    if (conf.conf_namespace.size()) {
+        source << "namespace " << conf.conf_namespace << " {" << std::endl
+            << std::endl;
+    }
+
+    if (conf.top_level_class) {
+        dump_source_class(conf.top_level_class.get(), source);
+    }
+
+    if (conf.conf_namespace.size()) {
+        source << "}" << std::endl;
+    }
+    }
+
 }

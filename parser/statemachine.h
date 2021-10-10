@@ -5,7 +5,8 @@
 
 #pragma once
 
-#include "meta-settings.h"
+#include "meta_settings.h"
+
 #include <QLoggingCategory>
 
 Q_DECLARE_LOGGING_CATEGORY(parser)

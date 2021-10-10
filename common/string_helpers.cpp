@@ -3,10 +3,8 @@
     SPDX-License-Identifier: MIT
 */
 
-#include "string-helpers.h"
+#include "string_helpers.h"
 #include <QLoggingCategory>
-
-Q_LOGGING_CATEGORY(stringDbg, "stringDbg")
 
 std::string camel_case_to_underscore(const std::string &s) {
   std::string ret;
