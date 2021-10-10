@@ -22,12 +22,18 @@ std::string array_value;
 } // namespace
 
 /* reads #include directives. */
-callback_t state_include(MetaConfiguration &conf, std::ifstream &f,
-                         int &error) {
-  char include_name[80];
-  f.ignore(256, '<');
-  f.getline(include_name, 80, '>'); // read untill >
-  conf.includes.push_back(include_name);
+callback_t state_include(MetaConfiguration &conf, std::ifstream &f, int &error) {
+  read_untill_delimiters(f, {'<', '"'});
+
+  char start_delimiter = f.get();
+  std::string include_name = read_untill_delimiters(f, {'<', '"'});
+
+  MetaInclude include {
+    .name = include_name,
+    .is_global = start_delimiter == '<'
+  };
+
+  conf.includes.push_back(include);
   qCDebug(parser) << "include added: " << include_name;
   return initial_state;
 }

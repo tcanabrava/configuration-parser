@@ -16,6 +16,14 @@
 struct MetaClass;
 struct MetaProperty;
 
+/*a struct to contain the includes*/
+struct MetaInclude {
+	std::string name;
+
+    // global includes are with <> and non global with ""
+	bool is_global;
+};
+
 /* struct that represents a variable in the configuration file. */
 struct MetaProperty {
   typedef std::shared_ptr<MetaProperty> Ptr;
@@ -38,7 +46,7 @@ struct MetaClass {
 
 /* struct that represents the whole configuration file. */
 struct MetaConfiguration {
-  std::vector<std::string> includes;
+  std::vector<MetaInclude> includes;
   std::shared_ptr<MetaClass> top_level_class = nullptr;
   std::string conf_namespace;
 };

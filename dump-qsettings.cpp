@@ -329,7 +329,11 @@ void dump_header(
   header << std::endl;
 
   for (auto include : conf.includes) {
-    header << "#include <" << include << ">" << std::endl;
+    if (include.is_global) {
+      header << "#include <" << include.name << '>' << std::endl;
+    } else {
+      header << "#include \"" << include.name << '"' << std::endl;
+    }
   }
 
   if (conf.includes.size()) {
