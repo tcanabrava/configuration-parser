@@ -34,18 +34,21 @@ find_package(Qt5 REQUIRED COMPONENTS Core)
 include_directories(.)
 include_directories(${Boost_INCLUDE_DIRS})
 
-add_executable(
-    confgen
+add_library(confgen_lib STATIC
     parser/statemachine.cpp
     common/string_helpers.cpp
     common/dump_common.cpp
     kconfig/dump_kconfig.cpp
     qobject/dump_qobject.cpp
     qsettings/dump_qsettings.cpp
+)
+target_link_libraries(confgen_lib Qt5::Core)
+
+add_executable(confgen
     main.cpp
 )
 
-target_link_libraries(confgen Boost::filesystem Qt5::Core ${EXTRA_SYSTEM_LIBRARIES})
+target_link_libraries(confgen confgen_lib Boost::filesystem ${EXTRA_SYSTEM_LIBRARIES})
 install(TARGETS confgen EXPORT ConfigurationParserTargets DESTINATION ${CMAKE_INSTALL_LIBDIR}/ConfigurationParser)
 
 configure_package_config_file(

@@ -7,17 +7,18 @@
 #include <boost/range/adaptor/filtered.hpp>
 #include <boost/algorithm/string/predicate.hpp>
 
-#include "string-helpers.h"
-#include "meta-settings.h"
-#include "statemachine.h"
-#include "dump-settings.h"
+#include "common/string_helpers.h"
+
+#include "parser/meta_settings.h"
+#include "parser/statemachine.h"
+
+#include "qobject/dump_qobject.h"
+#include "kconfig/dump_kconfig.h"
+#include "qsettings/dump_qsettings.h"
 
 using namespace boost;
 using boost::filesystem::directory_entry;
 using boost::filesystem::directory_iterator;
-
-Q_DECLARE_LOGGING_CATEGORY(unittests)
-Q_LOGGING_CATEGORY(unittests, "unittests")
 
 /* Check if the file represented by filename + one of the extensions exists on the filesystem */
 bool check_file_exists(std::string filename, const std::vector<std::string>& extensions) {
@@ -54,27 +55,63 @@ bool test_specific_file(const std::string& filename,
  * test_specific_file for each of them.
  * */
 int test_file(const std::string& filename) {
-    qCDebug(unittests) << "Starting the test for:" << filename;
+    std::cout << "Starting the test for:" << filename << "\n";
     std::ifstream file(filename + ".conf");
 
     MetaConfiguration conf = parse_configuration(file);
 
-    if (check_file_exists(filename, {".conf.h"})) {
-        dump_header(conf, filename + ".h", "");
+    // QObject
+    if (check_file_exists(filename, {".qobject.h"})) {
+        QObjectExport::dump_header(conf, filename + ".h", "");
         if (!test_specific_file(filename, {".h", ".conf.h"})) {
-            qCDebug(unittests) << "Error on" << filename << ".h";
+            std::cout << "Error on" << filename << ".h" << "\n";
             return -1;
         }
     }
 
-    if (check_file_exists(filename, {".conf.cpp"})) {
-        dump_source(conf, filename + ".cpp");
+    if (check_file_exists(filename, {".qobject.cpp"})) {
+        QObjectExport::dump_source(conf, filename + ".cpp");
         if (!test_specific_file(filename, {".cpp", ".conf.cpp"})){
-            qCDebug(unittests) << "Error on" << filename << ".cpp";
+            std::cout << "Error on" << filename << ".cpp" << "\n";
             return -1;
         }
     }
-    qCDebug(unittests) << "Finished test for: " << filename << " without errors";
+
+    // KConfig
+    if (check_file_exists(filename, {".kconfig.h"})) {
+        KConfigExport::dump_header(conf, filename + ".h", "");
+        if (!test_specific_file(filename, {".h", ".conf.h"})) {
+            std::cout << "Error on" << filename << ".h" << "\n";
+            return -1;
+        }
+    }
+
+    if (check_file_exists(filename, {".kconfig.cpp"})) {
+        KConfigExport::dump_source(conf, filename + ".cpp");
+        if (!test_specific_file(filename, {".cpp", ".conf.cpp"})){
+            std::cout << "Error on" << filename << ".cpp" << "\n";
+            return -1;
+        }
+    }
+
+    // QSettings
+    if (check_file_exists(filename, {".qsettings.h"})) {
+        QSettingsExport::dump_header(conf, filename + ".h", "");
+        if (!test_specific_file(filename, {".h", ".conf.h"})) {
+            std::cout << "Error on" << filename << ".h" << "\n";
+            return -1;
+        }
+    }
+
+    if (check_file_exists(filename, {".qsettings.cpp"})) {
+        QSettingsExport::dump_source(conf, filename + ".cpp");
+        if (!test_specific_file(filename, {".cpp", ".conf.cpp"})){
+            std::cout << "Error on" << filename << ".cpp" << "\n";
+            return -1;
+        }
+    }
+
+    std::cout << "Finished test for: " << filename << " without errors" << "\n";
     return 0;
 }
 
@@ -106,16 +143,19 @@ std::vector<std::string> find_filenames(int argc, char *argv[]) {
 
 /* runs all configuration files on the test cases*/
 int main(int argc, char *argv[]) {
-    qCDebug(unittests) << "Starting unittests";
+    std::cout << "Starting unittests" << "\n";
     std::vector<std::string> filenames = find_filenames(argc, argv);
 
     if (filenames.size() == 0) {
-        qCDebug(unittests) << "Please fix the testcase.";
+        std::cout << "Please fix the testcase." << "\n";
         return 0;
     }
 
     assert(filenames.size());
-    qCDebug(unittests) << "Testing the following files:" << filenames;
+    std::cout << "Testing the following files:\n";
+    for (const auto& file : filenames) {
+        std::cout << '\t' << file << "\n";
+    }
 
     for(const auto& file : filenames) {
         assert(test_file(file) == 0);
