@@ -1,4 +1,4 @@
-set(CMAKE_MODULE_PATH "../cmake")
+set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
 
 # Make sure the file can be compiled without errors
 add_library(my_cmake_test)
