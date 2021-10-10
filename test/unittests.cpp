@@ -44,7 +44,7 @@ bool test_specific_file(const std::string& filename,
         generated >> gen;
         expected >> exp;
         if (gen != exp) {
-            std::cout << "Error at " << exp;
+            std::cout << "Expected " << exp << " Generated " << gen << "\n";
             return false;
         }
     }
@@ -63,16 +63,16 @@ int test_file(const std::string& filename) {
     // QObject
     if (check_file_exists(filename, {".qobject.h"})) {
         QObjectExport::dump_header(conf, filename + ".h", "");
-        if (!test_specific_file(filename, {".h", ".conf.h"})) {
-            std::cout << "Error on" << filename << ".h" << "\n";
+        if (!test_specific_file(filename, {".h", ".qobject.h"})) {
+            std::cout << "QObject error on" << filename << ".h" << "\n";
             return -1;
         }
     }
 
     if (check_file_exists(filename, {".qobject.cpp"})) {
         QObjectExport::dump_source(conf, filename + ".cpp");
-        if (!test_specific_file(filename, {".cpp", ".conf.cpp"})){
-            std::cout << "Error on" << filename << ".cpp" << "\n";
+        if (!test_specific_file(filename, {".cpp", ".qobject.cpp"})){
+            std::cout << "QObject error on" << filename << ".cpp" << "\n";
             return -1;
         }
     }
@@ -80,16 +80,16 @@ int test_file(const std::string& filename) {
     // KConfig
     if (check_file_exists(filename, {".kconfig.h"})) {
         KConfigExport::dump_header(conf, filename + ".h", "");
-        if (!test_specific_file(filename, {".h", ".conf.h"})) {
-            std::cout << "Error on" << filename << ".h" << "\n";
+        if (!test_specific_file(filename, {".h", ".kconfig.h"})) {
+            std::cout << "KConfig rror on" << filename << ".h" << "\n";
             return -1;
         }
     }
 
     if (check_file_exists(filename, {".kconfig.cpp"})) {
         KConfigExport::dump_source(conf, filename + ".cpp");
-        if (!test_specific_file(filename, {".cpp", ".conf.cpp"})){
-            std::cout << "Error on" << filename << ".cpp" << "\n";
+        if (!test_specific_file(filename, {".cpp", ".kconfig.cpp"})){
+            std::cout << "KConfig error on" << filename << ".cpp" << "\n";
             return -1;
         }
     }
@@ -97,16 +97,16 @@ int test_file(const std::string& filename) {
     // QSettings
     if (check_file_exists(filename, {".qsettings.h"})) {
         QSettingsExport::dump_header(conf, filename + ".h", "");
-        if (!test_specific_file(filename, {".h", ".conf.h"})) {
-            std::cout << "Error on" << filename << ".h" << "\n";
+        if (!test_specific_file(filename, {".h", ".qsettings.h"})) {
+            std::cout << "QSettings error on" << filename << ".h" << "\n";
             return -1;
         }
     }
 
     if (check_file_exists(filename, {".qsettings.cpp"})) {
         QSettingsExport::dump_source(conf, filename + ".cpp");
-        if (!test_specific_file(filename, {".cpp", ".conf.cpp"})){
-            std::cout << "Error on" << filename << ".cpp" << "\n";
+        if (!test_specific_file(filename, {".cpp", ".qsettings.cpp"})){
+            std::cout << "QSettings error on" << filename << ".cpp" << "\n";
             return -1;
         }
     }
