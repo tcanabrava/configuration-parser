@@ -106,6 +106,6 @@ int main(int argc, char *argv[]) {
     QSettingsExport::dump_source(conf, name_without_ext + ".cpp");
   }
 
-  std::cout << "files generated" << std::filesystem::absolute(name_without_ext + ".h").string() << "\n";
-  std::cout << "files generated" << std::filesystem::absolute(name_without_ext + ".cpp").string() << "\n";
+  std::cout << "files generated " << std::filesystem::absolute(name_without_ext + ".h").string() << "\n";
+  std::cout << "files generated " << std::filesystem::absolute(name_without_ext + ".cpp").string() << "\n";
 }
