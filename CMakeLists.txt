@@ -47,6 +47,7 @@ target_link_libraries(confgen_lib Qt5::Core)
 add_executable(confgen
     main.cpp
 )
+add_executable(ConfigurationParser::confgen ALIAS confgen)
 
 target_link_libraries(confgen confgen_lib Boost::filesystem ${EXTRA_SYSTEM_LIBRARIES})
 install(TARGETS confgen EXPORT ConfigurationParserTargets DESTINATION ${CMAKE_INSTALL_LIBDIR}/ConfigurationParser)
