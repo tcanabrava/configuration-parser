@@ -1,9 +1,20 @@
 set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
 
-add_executable(my_cmake_test test.cpp)
-target_link_libraries(my_cmake_test Qt5::Core)
+add_executable(my_cmake_test_qsettings test.cpp)
+target_link_libraries(my_cmake_test_qsettings Qt5::Core)
 include(ConfigurationCompiler)
-compile_configuration(my_cmake_test demo.conf)
+compile_configuration(my_cmake_test_qsettings GENERATOR qsettings demo_qsettings.conf)
+
+find_package(KF5Config)
+add_executable(my_cmake_test_kconfig test.cpp)
+target_link_libraries(my_cmake_test_kconfig Qt5::Core KF5::ConfigCore)
+include(ConfigurationCompiler)
+compile_configuration(my_cmake_test_kconfig GENERATOR kconfig demo_kconfig.conf)
+
+add_executable(my_cmake_test_qobject test.cpp)
+target_link_libraries(my_cmake_test_qobject Qt5::Core)
+include(ConfigurationCompiler)
+compile_configuration(my_cmake_test_qobject GENERATOR qobject demo_qobject.conf)
 
 enable_testing()
 add_definitions(-g)
