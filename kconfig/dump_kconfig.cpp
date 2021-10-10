@@ -19,13 +19,16 @@ void dump_source_class_settings_set_values(MetaClass *top,
                                            std::ofstream &file, const std::string& parentGroup) {
   std::string mainGroup = parentGroup;
 
-  if (top->parent) {
-    // KConfig API uses pointers / values =[
-    std::string methodAcessor = parentGroup == "internal_config" ? "->" : ".";
+  // KConfig API uses pointers / values =[
+  std::string methodAcessor = parentGroup == "internal_config" ? "->" : ".";
 
+  if (top->parent) {
       mainGroup = decapitalize(top->name, 0) + "Group";
     file << "\t" << "KConfigGroup " << mainGroup << " = "
         << parentGroup << methodAcessor << "group(\"" << top->name << "\");" << std::endl;
+  } else {
+      mainGroup = "generalGroup";
+      file << "KConfigGroup generalGroup(internal_config, \"General\");";
   }
 
   for (auto &&s : top->subclasses) {
@@ -54,12 +57,17 @@ void dump_source_class_settings_get_values(MetaClass *top,
                                            std::ofstream &file,
                                            const std::string& parentGroup) {
   std::string mainGroup = parentGroup;
+
+  // KConfig API uses pointers / values =[
+  std::string methodAcessor = parentGroup == "internal_config" ? "->" : ".";
+
   if (top->parent) {
-    // KConfig API uses pointers / values =[
-    std::string methodAcessor = parentGroup == "internal_config" ? "->" : ".";
     mainGroup = decapitalize(top->name, 0) + "Group";
     file << "\tKConfigGroup " << mainGroup << " = "
         << parentGroup << methodAcessor << "group(\"" << top->name << "\");" << std::endl;
+  } else {
+      mainGroup = "generalGroup";
+      file << "KConfigGroup generalGroup(internal_config, \"General\");";
   }
 
   for (auto &&s : top->subclasses) {
