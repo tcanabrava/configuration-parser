@@ -1,29 +1,33 @@
 set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
 
-# Make sure the file can be compiled without errors
-add_library(my_cmake_test)
+add_executable(my_cmake_test test.cpp)
 target_link_libraries(my_cmake_test Qt5::Core)
 include(ConfigurationCompiler)
 compile_configuration(my_cmake_test demo.conf)
 
-#macro(TEST NAME FILE)
-	#add_executable(${NAME} ${FILE} )
-	#target_link_libraries(${NAME} ${Boost_LIBRARIES} parser Qt5::Core)
-	#target_link_libraries(${NAME} ${Boost_LIBRARIES} parser Qt5::Core)
-	#add_test(NAME ${NAME} COMMAND  $<TARGET_FILE:${NAME}>)
-#endmacro()
+enable_testing()
+add_definitions(-g)
 
-#enable_testing()
-#add_definitions(-g)
+include_directories(${CMAKE_SOURCE_DIR})
 
-## TEST(unittests unittests.cpp)
+add_executable(
+    generator_tests
+    unittests.cpp)
 
-#add_custom_target(check COMMAND ${CMAKE_CTEST_COMMAND}
-	#DEPENDS
-        #pre-check
-        #unittests
-#)
+target_link_libraries(generator_tests confgen_lib Boost::filesystem  Qt5::Core)
 
-#FILE(GLOB TESTS *.conf*)
+add_custom_target(check
+    COMMAND
+        ${CMAKE_CTEST_COMMAND}
+    DEPENDS
+        pre-check
+        unittests
+)
 
-#add_custom_target(pre-check  COMMAND cp ${TESTS} ${CMAKE_BINARY_DIR}/test)
+FILE(GLOB KCONFIG_TESTS *.kconfig*)
+FILE(GLOB QOBJECT_TESTS *.qobject*)
+FILE(GLOB QSETTINGS_TESTS *.qsettings*)
+
+add_custom_target(pre-check  COMMAND cp ${KCONFIG_TESTS} ${QOBJECT_TESTS} ${QSETTINGS_TESTS} ${CMAKE_BINARY_DIR}/test)
+
+add_test(GenTests generator_tests)

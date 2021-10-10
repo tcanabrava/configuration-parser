@@ -7,12 +7,20 @@
 
 function(compile_configuration target_or_source_var)
     set(options)
-    set(oneValueArgs EXPORT_HEADER)
+    set(oneValueArgs EXPORT_HEADER GENERATOR)
     set(multiValueArgs OPTIONS DEPENDS)
 
     cmake_parse_arguments(_WRAP_CPP "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
 
     set(configuration_files ${_WRAP_CPP_UNPARSED_ARGUMENTS})
+
+
+    if (NOT DEFINED _WRAP_CPP_GENERATOR)
+        set(GENERATOR "--qsettings")
+        message("No generator set, defaulting to --qsettings. Options are qsettings, kconfig or qobject")
+    else()
+        set(GENERATOR "--${_WRAP_CPP_GENERATOR}")
+    endif()
 
     if (NOT DEFINED _WRAP_CPP_EXPORT_HEADER)
         set(EXPORT_HEADER_USAGE)
@@ -34,7 +42,7 @@ function(compile_configuration target_or_source_var)
 
         add_custom_command(
             OUTPUT "${_FILENAME_}.cpp" "${_FILENAME_}.h"
-            COMMAND ConfigurationParser::confgen ${EXPORT_HEADER_USAGE} ${it}
+            COMMAND ConfigurationParser::confgen ${GENERATOR} ${EXPORT_HEADER_USAGE} ${it}
             WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
             MAIN_DEPENDENCY ${it}
         )
