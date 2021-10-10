@@ -26,7 +26,9 @@ callback_t state_include(MetaConfiguration &conf, std::ifstream &f, int &error) 
   read_untill_delimiters(f, {'<', '"'});
 
   char start_delimiter = f.get();
-  std::string include_name = read_untill_delimiters(f, {'<', '"'});
+  qDebug() << "Delimiter" << start_delimiter;
+  std::string include_name = read_untill_delimiters(f, {'>', '"'});
+  f.ignore(); // ignore the end delimiter.
 
   MetaInclude include {
     .name = include_name,
