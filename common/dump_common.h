@@ -18,10 +18,10 @@ std::string get_call_chain(std::shared_ptr<MetaProperty> property, std::string s
 void dump_source_get_methods(std::ofstream& f, MetaClass *currClass);
 
 // dump all set methods from the MetaClass
-void dump_source_set_methods(std::ofstream& f, MetaClass *currClass);
+void dump_source_set_methods(std::ofstream& f, MetaClass *currClass, bool useRules = true);
 
 // dump all header properties from the MetaProperty
-void dump_header_properties(std::ofstream &file, const std::vector<std::shared_ptr<MetaProperty>> &properties);
+void dump_header_properties(std::ofstream &file, const std::vector<std::shared_ptr<MetaProperty>> &properties, bool useRules = true);
 
 // dump all q_properties from the MetaProperty
 void dump_header_q_properties(std::ofstream& f,  const std::vector<std::shared_ptr<MetaProperty>> &properties);

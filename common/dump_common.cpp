@@ -50,7 +50,7 @@ void dump_source_get_methods(std::ofstream& f, MetaClass *top)
   }
 }
 
-void dump_source_set_methods(std::ofstream& f, MetaClass *top) {
+void dump_source_set_methods(std::ofstream& f, MetaClass *top, bool useRules) {
   for (auto &&p : top->properties) {
     f << "void " << top->name << "::set" << capitalize(p->name, 0) << '(';
         dump_parameter(f, p);
@@ -59,9 +59,13 @@ void dump_source_set_methods(std::ofstream& f, MetaClass *top) {
     f << "\tif (_" << p->name << "==" << "value) {" << std::endl;
     f << "\t\treturn;" << std::endl;
     f << "\t}" << std::endl;
-    f << "\tif (" << p->name << "Rule && !" << p->name << "Rule(value)) {" << std::endl;
-    f << "\t\treturn;" << std::endl;
-    f << "\t}" << std::endl;
+
+    if (useRules) {
+        f << "\tif (" << p->name << "Rule && !" << p->name << "Rule(value)) {" << std::endl;
+        f << "\t\treturn;" << std::endl;
+        f << "\t}" << std::endl;
+    }
+
     f << "\t_" << p->name << " = value;" << std::endl;
     f << "\tQ_EMIT " << p->name << "Changed(value);" << std::endl;
     f << "}" << std::endl;
@@ -80,14 +84,16 @@ void dump_parameter(std::ofstream& file, const std::shared_ptr<MetaProperty>& p)
     file << " value";
 }
 
-void dump_header_properties(std::ofstream &file, const std::vector<std::shared_ptr<MetaProperty>> &properties) {
+void dump_header_properties(std::ofstream &file, const std::vector<std::shared_ptr<MetaProperty>> &properties, bool useRules) {
   if (!properties.size())
     return;
 
   for (auto &&p : properties) {
     file << "\t" << p->type << " " << p->name << "() const;" << std::endl;
-    file << "\tvoid set" << capitalize(p->name, 0) << "Rule(std::function<bool("
-         << p->type << ")> rule);" << std::endl;
+    if (useRules) {
+        file << "\tvoid set" << capitalize(p->name, 0) << "Rule(std::function<bool("
+            << p->type << ")> rule);" << std::endl;
+    }
     file << "\t" << p->type << " " << p->name << "Default() const;" << std::endl;
   }
 
@@ -107,7 +113,9 @@ void dump_header_properties(std::ofstream &file, const std::vector<std::shared_p
   file << std::endl << "private:" << std::endl;
   for (auto &&p : properties) {
     file << "\t" << p->type << " _" << p->name << ";" << std::endl;
-    file << "\tstd::function<bool(" << p->type << ")> " << p->name << "Rule;" << std::endl;
+    if (useRules) {
+        file << "\tstd::function<bool(" << p->type << ")> " << p->name << "Rule;" << std::endl;
+    }
   }
 }
 

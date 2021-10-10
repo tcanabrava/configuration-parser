@@ -33,7 +33,7 @@ void dump_source_class(MetaClass *top, std::ofstream &file) {
   file << std::endl;
 
   dump_source_get_methods(file, top);
-  dump_source_set_methods(file, top);
+  dump_source_set_methods(file, top, false);
 }
 
 void dump_header_class(MetaClass *top, std::ofstream &file) {
@@ -51,7 +51,7 @@ void dump_header_class(MetaClass *top, std::ofstream &file) {
   file << "public:" << std::endl;
   file << "\t" << top->name << "(QObject *parent = 0);" << std::endl;
 
-  dump_header_properties(file, top->properties);
+  dump_header_properties(file, top->properties, false);
   file << "};" << std::endl << std::endl;
 }
 
