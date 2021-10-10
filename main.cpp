@@ -36,8 +36,8 @@ bool hasBoolOpt(std::string optName, int argc, char *argv[]) {
 std::string exportHeader(int argc, char *argv[])
 {
     for (int i = 0; i < argc; i++) {
-        QString export_file(argv[1]);
-        if (!export_file.contains("--with-xport-header=")) {
+        QString export_file(argv[i]);
+        if (export_file.contains("--with-xport-header=")) {
             return export_file
                 .split("=",
 #if QT_VERSION < QT_VERSION_CHECK(5, 14, 0)
@@ -70,13 +70,13 @@ int main(int argc, char *argv[]) {
     return 0;
   }
 
-  const std::string file_name;
   QFileInfo info(QString::fromStdString(last_opt));
   if (!info.exists()) {
     std::cout << "The specified file doesn't exist: " << last_opt << "\n";
     return 0;
   }
 
+  const std::string file_name = info.absoluteFilePath().toStdString();
   std::ifstream file(file_name);
   if ((file.rdstate() & std::ifstream::failbit) != 0) {
     qDebug() << "could not open file.";
