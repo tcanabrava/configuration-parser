@@ -28,11 +28,9 @@ include(GNUInstallDirs)
 include(CMakePackageConfigHelpers)
 set(CMAKECONFIG_INSTALL_DIR "${CMAKE_INSTALL_LIBDIR}/cmake/ConfigurationParser")
 
-find_package(Boost COMPONENTS filesystem system REQUIRED)
 find_package(Qt5 REQUIRED COMPONENTS Core)
 
 include_directories(.)
-include_directories(${Boost_INCLUDE_DIRS})
 
 add_library(confgen_lib STATIC
     parser/statemachine.cpp
@@ -49,7 +47,7 @@ add_executable(confgen
 )
 add_executable(ConfigurationParser::confgen ALIAS confgen)
 
-target_link_libraries(confgen confgen_lib Boost::filesystem ${EXTRA_SYSTEM_LIBRARIES})
+target_link_libraries(confgen confgen_lib ${EXTRA_SYSTEM_LIBRARIES})
 install(TARGETS confgen EXPORT ConfigurationParserTargets DESTINATION ${CMAKE_INSTALL_LIBDIR}/ConfigurationParser)
 
 configure_package_config_file(

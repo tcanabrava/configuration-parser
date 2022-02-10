@@ -6,13 +6,33 @@
 /* State Machine to handle the configuration file. */
 #include "statemachine.h"
 #include "common/string_helpers.h"
-#include <boost/algorithm/string.hpp>
 #include <iostream>
 #include <memory>
 
 Q_LOGGING_CATEGORY(parser, "parser")
 
 namespace {
+
+// trim from start (in place)
+static inline void ltrim(std::string &s) {
+    s.erase(s.begin(), std::find_if(s.begin(), s.end(), [](unsigned char ch) {
+        return !std::isspace(ch);
+    }));
+}
+
+// trim from end (in place)
+static inline void rtrim(std::string &s) {
+    s.erase(std::find_if(s.rbegin(), s.rend(), [](unsigned char ch) {
+        return !std::isspace(ch);
+    }).base(), s.end());
+}
+
+// trim from both ends (in place)
+static inline void trim(std::string &s) {
+    ltrim(s);
+    rtrim(s);
+}
+
 std::shared_ptr<MetaProperty> current_property;
 std::shared_ptr<MetaClass> current_class;
 
@@ -44,13 +64,13 @@ callback_t multi_purpose_string_state(MetaConfiguration &conf, std::ifstream &f,
                                       int &error) {
   std::vector<char> delimiters = {'{', '[', '=', ' ', '\n'};
   global_string += read_untill_delimiters(f, delimiters);
-  boost::trim(global_string);
+  trim(global_string);
 
   qCDebug(parser) << "string found: " << global_string
                   << " next character: " << (char)f.peek();
   if (!conf.top_level_class && global_string == "namespace") {
     conf.conf_namespace = read_untill_delimiters(f, {'{'});
-    boost::trim(conf.conf_namespace);
+    trim(conf.conf_namespace);
 
     f.ignore();
     global_string.clear();
@@ -104,7 +124,7 @@ callback_t begin_class_state(MetaConfiguration &conf, std::ifstream &f,
 
   f.ignore(); // eat the '{' character.
   clear_empty(f);
-  boost::trim(global_string);
+  trim(global_string);
 
   if (!conf.top_level_class) {
     qCDebug(parser) << "Creating the top level class";
@@ -146,7 +166,7 @@ callback_t begin_property_state(MetaConfiguration &conf, std::ifstream &f,
   std::string property_name;
   clear_empty(f);
 
-  boost::trim(global_string);
+  trim(global_string);
   current_property = std::make_shared<MetaProperty>();
 
   if (global_string == "enum") {
@@ -161,7 +181,7 @@ callback_t begin_property_state(MetaConfiguration &conf, std::ifstream &f,
 
   // find the name of the property
   property_name = read_untill_delimiters(f, {'=', '\n'});
-  boost::trim(property_name);
+  trim(property_name);
   current_property->name = property_name;
   qCDebug(parser) << "Starting property " << property_name << " ";
   return property_state;

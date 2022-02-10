@@ -7,8 +7,8 @@
 #include "common/string_helpers.h"
 
 #include <QLoggingCategory>
-#include <boost/filesystem.hpp>
 
+#include <filesystem>
 
 Q_LOGGING_CATEGORY(dumpKConfigSource, "dumpSource")
 Q_LOGGING_CATEGORY(dumpKConfigHeader, "dumpHeader")
@@ -350,7 +350,7 @@ void dump_header(
 
 void dump_source(const MetaConfiguration &conf, const std::string &filename) {
   std::ofstream source(filename);
-  boost::filesystem::path path(filename);
+  std::filesystem::path path(filename);
 
   dump_notice(source);
 

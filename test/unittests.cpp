@@ -3,10 +3,6 @@
 #include <vector>
 #include <iostream>
 
-#include <boost/filesystem.hpp>
-#include <boost/range/adaptor/filtered.hpp>
-#include <boost/algorithm/string/predicate.hpp>
-
 #include "common/string_helpers.h"
 
 #include "parser/meta_settings.h"
@@ -16,14 +12,12 @@
 #include "kconfig/dump_kconfig.h"
 #include "qsettings/dump_qsettings.h"
 
-using namespace boost;
-using boost::filesystem::directory_entry;
-using boost::filesystem::directory_iterator;
+#include <filesystem>
 
 /* Check if the file represented by filename + one of the extensions exists on the filesystem */
 bool check_file_exists(std::string filename, const std::vector<std::string>& extensions) {
     for(const auto& extension : extensions) {
-        if(!filesystem::exists(filename + extension)) {
+        if(!std::filesystem::exists(filename + extension)) {
             std::cout << "Filename informed doesn't exist: " << (filename + extension) << std::endl;
             return false;
         }

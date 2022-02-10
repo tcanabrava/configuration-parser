@@ -21,11 +21,11 @@ add_definitions(-g)
 
 include_directories(${CMAKE_SOURCE_DIR})
 
-add_executable(
-    generator_tests
-    unittests.cpp)
+#add_executable(
+#    generator_tests
+#    unittests.cpp)
 
-target_link_libraries(generator_tests confgen_lib Boost::filesystem  Qt5::Core)
+#target_link_libraries(generator_tests confgen_lib Qt5::Core)
 
 add_custom_target(check
     COMMAND
@@ -41,4 +41,4 @@ FILE(GLOB QSETTINGS_TESTS *.qsettings*)
 
 add_custom_target(pre-check  COMMAND cp ${KCONFIG_TESTS} ${QOBJECT_TESTS} ${QSETTINGS_TESTS} ${CMAKE_BINARY_DIR}/test)
 
-add_test(GenTests generator_tests)
+# add_test(GenTests generator_tests)

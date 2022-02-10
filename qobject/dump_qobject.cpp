@@ -8,8 +8,7 @@
 
 #include "parser/meta_settings.h"
 
-#include <boost/filesystem.hpp>
-
+#include <filesystem>
 #include <cassert>
 
 Q_LOGGING_CATEGORY(dumpSource, "dumpSource")
@@ -96,7 +95,7 @@ void dump_header(
 }
 
 void dump_source(const MetaConfiguration &conf, const std::string &filename) {
-  boost::filesystem::path path(filename);
+  std::filesystem::path path(filename);
   std::ofstream source(path.filename().generic_string());
 
   dump_notice(source);
