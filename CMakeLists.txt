@@ -72,6 +72,8 @@ install(EXPORT ConfigurationParserTargets
         FILE ConfigurationParserTargets.cmake
         NAMESPACE ConfigurationParser:: )
 
-enable_testing()
-add_subdirectory(test)
+if (ENABLE_TESTING) 
+	enable_testing()
+	add_subdirectory(test)
+endif()
 
