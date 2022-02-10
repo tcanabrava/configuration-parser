@@ -51,8 +51,8 @@ callback_t state_include(MetaConfiguration &conf, std::ifstream &f, int &error) 
   f.ignore(); // ignore the end delimiter.
 
   MetaInclude include {
-    .name = include_name,
-    .is_global = start_delimiter == '<'
+    include_name,
+    start_delimiter == '<'
   };
 
   conf.includes.push_back(include);
