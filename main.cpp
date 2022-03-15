@@ -37,7 +37,7 @@ std::string exportHeader(int argc, char *argv[])
 {
     for (int i = 0; i < argc; i++) {
         QString export_file(argv[i]);
-        if (export_file.contains("--with-xport-header=")) {
+        if (export_file.contains("--with-export-header=")) {
             return export_file
                 .split("=",
 #if QT_VERSION < QT_VERSION_CHECK(5, 14, 0)
