@@ -34,7 +34,7 @@ void dump_source_class_settings_set_values(MetaClass *top,
   for (auto &&p : top->properties) {
     file << tabs << "if (" << get_call_chain(p, "") << " == " << get_call_chain(p, "Default") << "){" << std::endl;
     file << tabs << "\ts.remove(\"" << camel_case_to_underscore(p->name) << "\");" << std::endl;
-    file << tabs << "} else { " << std::endl;
+    file << tabs << "} else {" << std::endl;
     file << tabs << "\ts.setValue(\"" << camel_case_to_underscore(p->name)
          << "\",";
 
