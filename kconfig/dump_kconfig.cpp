@@ -310,6 +310,10 @@ void dump_header(
   qCDebug(dumpKConfigSource) << "Starting to dump the source file into" << filename;
 
   std::ofstream header(filename);
+  // disable clang format for this, it's an automated file.
+
+  header << "// clang-format off" << std::endl;
+
   begin_header_guards(header, filename);
   header << std::endl;
 
@@ -346,11 +350,17 @@ void dump_header(
   if (conf.conf_namespace.size()) {
     header << "}" << std::endl;
   }
+
+  header << std::endl;
+  header << "// clang-format on" << std::endl;
 }
 
-void dump_source(const MetaConfiguration &conf, const std::string &filename) {
+void dump_source(const MetaConfiguration &conf, const std::string &filename)
+{
   std::ofstream source(filename);
   std::filesystem::path path(filename);
+
+  source << "// clang-format off" << std::endl;
 
   dump_notice(source);
 
@@ -374,6 +384,10 @@ void dump_source(const MetaConfiguration &conf, const std::string &filename) {
   if (conf.conf_namespace.size()) {
     source << "}" << std::endl;
   }
+
+  source << std::endl;
+  source << "// clang-format on" << std::endl;
+
 }
 
 }

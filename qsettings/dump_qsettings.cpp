@@ -293,14 +293,17 @@ void dump_header_class(
 } // end unammed namespace
 
 namespace QSettingsExport {
-    void dump_header(
-        const MetaConfiguration &conf,
-        const std::string &filename,
-        const std::string &exportHeader)
-    {
+void dump_header(
+    const MetaConfiguration &conf,
+    const std::string &filename,
+    const std::string &exportHeader)
+{
     qCDebug(dumpQSettingsHeader) << "Starting to dump the source file into" << filename;
 
     std::ofstream header(filename);
+
+    header << "// clang-format off" << std::endl;
+
     begin_header_guards(header, filename);
     header << std::endl;
 
@@ -338,11 +341,17 @@ namespace QSettingsExport {
     if (conf.conf_namespace.size()) {
         header << "}" << std::endl;
     }
-    }
 
-    void dump_source(const MetaConfiguration &conf, const std::string &filename) {
+    header << std::endl;
+    header << "// clang-format on" << std::endl;
+}
+
+void dump_source(const MetaConfiguration &conf, const std::string &filename)
+{
     std::ofstream source(filename);
     std::filesystem::path path(filename);
+
+    source << "// clang-format off" << std::endl;
 
     dump_notice(source);
 
@@ -363,6 +372,9 @@ namespace QSettingsExport {
     if (conf.conf_namespace.size()) {
         source << "}" << std::endl;
     }
-    }
+
+    source << std::endl;
+    source << "// clang-format on" << std::endl;
+}
 
 }

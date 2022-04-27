@@ -64,6 +64,9 @@ void dump_header(
     const std::string &exportHeader)
 {
   std::ofstream header(filename);
+
+  header << "// clang-format off" << std::endl;
+
   begin_header_guards(header, filename);
   header << std::endl;
 
@@ -92,11 +95,17 @@ void dump_header(
   if (conf.conf_namespace.size()) {
     header << "}" << std::endl;
   }
+
+  header << std::endl;
+  header << "// clang-format on" << std::endl;
 }
 
-void dump_source(const MetaConfiguration &conf, const std::string &filename) {
+void dump_source(const MetaConfiguration &conf, const std::string &filename)
+{
   std::filesystem::path path(filename);
   std::ofstream source(path.filename().generic_string());
+
+  source << "// clang-format off" << std::endl;
 
   dump_notice(source);
 
@@ -116,6 +125,9 @@ void dump_source(const MetaConfiguration &conf, const std::string &filename) {
   if (conf.conf_namespace.size()) {
     source << "}" << std::endl;
   }
+
+  source << std::endl;
+  source << "// clang-format on" << std::endl;
 }
 
 }
