@@ -342,7 +342,6 @@ void dump_header(
         header << "}" << std::endl;
     }
 
-    header << std::endl;
     header << "// clang-format on" << std::endl;
 }
 
@@ -373,7 +372,6 @@ void dump_source(const MetaConfiguration &conf, const std::string &filename)
         source << "}" << std::endl;
     }
 
-    source << std::endl;
     source << "// clang-format on" << std::endl;
 }
 
