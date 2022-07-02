@@ -52,7 +52,7 @@ std::string exportHeader(int argc, char *argv[])
 }
 
 void show_usage(const char appname[]) {
-  std::cout << "usage" << appname << " [--kconfig | --qsettings | --qobject] [--with-export-header=header] file.conf\n";
+  std::cout << "usage" << appname << " [--kconfig | --qsettings | --qobject] [--with-export-header=header] [--no-singleton] file.conf\n";
   std::cout << "\t this will generate a header / source pair\n";
   std::cout << "\t with everything you need to start coding.\n";
 }
@@ -83,6 +83,8 @@ int main(int argc, char *argv[]) {
     return 0;
   }
 
+  const bool generateSingleton = !hasBoolOpt("--no-singleton", argc, argv);
+
   const bool exportKConfig = hasBoolOpt("--kconfig", argc, argv);
   const bool exportQObject = hasBoolOpt("--qobject", argc, argv);
   const bool exportQSettings = hasBoolOpt("--qsettings", argc, argv) || !(exportKConfig || exportQObject);
@@ -96,14 +98,14 @@ int main(int argc, char *argv[]) {
   std::string name_without_ext = outfile.substr(0, substrSize);
 
   if (exportKConfig) {
-    KConfigExport::dump_header(conf, name_without_ext + ".h", exportHeaderFile);
-    KConfigExport::dump_source(conf, name_without_ext + ".cpp");
+    KConfigExport::dump_header(conf, name_without_ext + ".h", exportHeaderFile, generateSingleton);
+    KConfigExport::dump_source(conf, name_without_ext + ".cpp", generateSingleton);
   } else if (exportQObject) {
     QObjectExport::dump_header(conf, name_without_ext + ".h", exportHeaderFile);
     QObjectExport::dump_source(conf, name_without_ext + ".cpp");
   } else if (exportQSettings) {
-    QSettingsExport::dump_header(conf, name_without_ext + ".h", exportHeaderFile);
-    QSettingsExport::dump_source(conf, name_without_ext + ".cpp");
+    QSettingsExport::dump_header(conf, name_without_ext + ".h", exportHeaderFile, generateSingleton);
+    QSettingsExport::dump_source(conf, name_without_ext + ".cpp", generateSingleton);
   }
 
   std::cout << "files generated " << std::filesystem::absolute(name_without_ext + ".h").string() << "\n";

@@ -12,10 +12,12 @@ namespace KConfigExport {
 void dump_header(
     const MetaConfiguration &config,
     const std::string &filename,
-    const std::string &exportHeader);
+    const std::string &exportHeader,
+    bool generateSingleton);
 
 void dump_source(
     const MetaConfiguration &config,
-    const std::string &filename);
+    const std::string &filename,
+    bool generateSingleton);
 
 }

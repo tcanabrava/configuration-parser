@@ -111,9 +111,9 @@ bool class_or_subclass_have_properties(MetaClass *top) {
   return false;
 }
 
-void dump_source_class(MetaClass *top, std::ofstream &file) {
+void dump_source_class(MetaClass *top, std::ofstream &file, bool generateSingleton) {
   for (auto &&child : top->subclasses) {
-    dump_source_class(child.get(), file);
+    dump_source_class(child.get(), file, generateSingleton);
   }
 
   // Constructors.
@@ -205,11 +205,15 @@ void dump_source_class(MetaClass *top, std::ofstream &file) {
     }
     file << '}' << std::endl;
     file << std::endl;
-    file << top->name << "* " << top->name << "::self()" << std::endl;
-    file << "{" << std::endl;
-    file << "\tstatic " << top->name << " s;" << std::endl;
-    file << "\treturn &s;" << std::endl;
-    file << "}" << std::endl;
+
+    // Sigleton method
+    if (generateSingleton) {
+        file << top->name << "* " << top->name << "::self()" << std::endl;
+        file << "{" << std::endl;
+        file << "\tstatic " << top->name << " s;" << std::endl;
+        file << "\treturn &s;" << std::endl;
+        file << "}" << std::endl;
+    }
   }
 }
 
@@ -233,12 +237,12 @@ void dump_header_subclasses(
 void dump_header_class(
     MetaClass *top,
     std::ofstream &file,
-    const std::string &exportExpression)
+    const std::string &exportExpression,
+    bool generateSingleton)
 {
-
   qCDebug(dumpQSettingsHeader) << "Dumping class header";
   for (auto &&child : top->subclasses) {
-    dump_header_class(child.get(), file, exportExpression);
+    dump_header_class(child.get(), file, exportExpression, generateSingleton);
   }
 
   file << "class ";
@@ -268,7 +272,9 @@ void dump_header_class(
   } else {
     file << "\tvoid sync();" << std::endl;
     file << "\tvoid load();" << std::endl;
-    file << "\tstatic " << top->name << "* self();" << std::endl;
+    if (generateSingleton) {
+        file << "\tstatic " << top->name << "* self();" << std::endl;
+    }
   }
 
   file << "\t void loadDefaults();" << std::endl;
@@ -296,7 +302,8 @@ namespace QSettingsExport {
 void dump_header(
     const MetaConfiguration &conf,
     const std::string &filename,
-    const std::string &exportHeader)
+    const std::string &exportHeader,
+    bool generateSingleton)
 {
     qCDebug(dumpQSettingsHeader) << "Starting to dump the source file into" << filename;
 
@@ -335,7 +342,7 @@ void dump_header(
     }
 
     if (conf.top_level_class) {
-        dump_header_class(conf.top_level_class.get(), header, export_name);
+        dump_header_class(conf.top_level_class.get(), header, export_name, generateSingleton);
     }
 
     if (conf.conf_namespace.size()) {
@@ -345,7 +352,7 @@ void dump_header(
     header << "// clang-format on" << std::endl;
 }
 
-void dump_source(const MetaConfiguration &conf, const std::string &filename)
+void dump_source(const MetaConfiguration &conf, const std::string &filename, bool generateSingleton)
 {
     std::ofstream source(filename);
     std::filesystem::path path(filename);
@@ -365,7 +372,7 @@ void dump_source(const MetaConfiguration &conf, const std::string &filename)
     }
 
     if (conf.top_level_class) {
-        dump_source_class(conf.top_level_class.get(), source);
+        dump_source_class(conf.top_level_class.get(), source, generateSingleton);
     }
 
     if (conf.conf_namespace.size()) {
