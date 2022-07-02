@@ -7,6 +7,7 @@
 #include "statemachine.h"
 #include "common/string_helpers.h"
 #include <iostream>
+#include <cassert>
 #include <memory>
 
 Q_LOGGING_CATEGORY(parser, "parser")
